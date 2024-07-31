@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using TechnixModel;
 
 namespace TechnixDemo.Helper
 {
@@ -40,44 +39,44 @@ namespace TechnixDemo.Helper
                 return ress;
             }
         }
-        public async Task<bool> PostClientDt(GenerateModel dataToSend)
-        {
-            using (HttpClient client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("http://localhost:5164/Generate");
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(
-                    new MediaTypeWithQualityHeaderValue("application/json"));
+        //public async Task<bool> PostClientDt(GenerateModel dataToSend)
+        //{
+        //    using (HttpClient client = new HttpClient())
+        //    {
+        //        client.BaseAddress = new Uri("http://localhost:5164/Generate");
+        //        client.DefaultRequestHeaders.Accept.Clear();
+        //        client.DefaultRequestHeaders.Accept.Add(
+        //            new MediaTypeWithQualityHeaderValue("application/json"));
 
-                // Serialize the data to send to JSON
-                var jsonContent = JsonConvert.SerializeObject(dataToSend);
-                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+        //        // Serialize the data to send to JSON
+        //        var jsonContent = JsonConvert.SerializeObject(dataToSend);
+        //        var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
 
 
-                try
-                {
-                    // Perform the POST request
-                    var responseMessage = await client.PostAsync(string.Empty, content);
+        //        try
+        //        {
+        //            // Perform the POST request
+        //            var responseMessage = await client.PostAsync(string.Empty, content);
 
-                    // Check if the response is successful
-                    if (responseMessage.IsSuccessStatusCode)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        // Optionally log the response status code or reason phrase
-                        Console.WriteLine($"Error: {responseMessage.StatusCode} - {responseMessage.ReasonPhrase}");
-                        return false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Handle any exceptions that occur during the HTTP request
-                    Console.WriteLine($"Exception occurred: {ex.Message}");
-                    return false;
-                }
-            }
-        }
+        //            // Check if the response is successful
+        //            if (responseMessage.IsSuccessStatusCode)
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                // Optionally log the response status code or reason phrase
+        //                Console.WriteLine($"Error: {responseMessage.StatusCode} - {responseMessage.ReasonPhrase}");
+        //                return false;
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            // Handle any exceptions that occur during the HTTP request
+        //            Console.WriteLine($"Exception occurred: {ex.Message}");
+        //            return false;
+        //        }
+        //    }
+        //}
         }
 }
