@@ -33,7 +33,7 @@
             Close = new Button();
             label2 = new Label();
             Generate = new Button();
-            dataGridView1 = new DataGridView();
+            EntityGrid = new DataGridView();
             Select = new DataGridViewCheckBoxColumn();
             TableName = new DataGridViewTextBoxColumn();
             GetAll = new DataGridViewCheckBoxColumn();
@@ -42,7 +42,7 @@
             Update = new DataGridViewCheckBoxColumn();
             Delete = new DataGridViewCheckBoxColumn();
             panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)EntityGrid).BeginInit();
             SuspendLayout();
             // 
             // panel1
@@ -94,16 +94,19 @@
             Generate.Text = "Generate";
             Generate.UseVisualStyleBackColor = false;
             // 
-            // dataGridView1
+            // EntityGrid
             // 
-            dataGridView1.BackgroundColor = Color.White;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { Select, TableName, GetAll, GetById, Save, Update, Delete });
-            dataGridView1.Location = new Point(31, 82);
-            dataGridView1.Name = "dataGridView1";
-            dataGridView1.RowTemplate.Height = 25;
-            dataGridView1.Size = new Size(563, 177);
-            dataGridView1.TabIndex = 11;
+            EntityGrid.AllowUserToAddRows = false;
+            EntityGrid.AllowUserToDeleteRows = false;
+            EntityGrid.BackgroundColor = Color.White;
+            EntityGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            EntityGrid.Columns.AddRange(new DataGridViewColumn[] { Select, TableName, GetAll, GetById, Save, Update, Delete });
+            EntityGrid.Location = new Point(31, 82);
+            EntityGrid.Name = "EntityGrid";
+            EntityGrid.ReadOnly = true;
+            EntityGrid.RowTemplate.Height = 25;
+            EntityGrid.Size = new Size(563, 177);
+            EntityGrid.TabIndex = 11;
             // 
             // Select
             // 
@@ -160,7 +163,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(615, 311);
-            Controls.Add(dataGridView1);
+            Controls.Add(EntityGrid);
             Controls.Add(label2);
             Controls.Add(Generate);
             Controls.Add(panel1);
@@ -168,7 +171,7 @@
             Name = "EntityData";
             Text = "EntityData";
             panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)EntityGrid).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -187,5 +190,6 @@
         private DataGridViewCheckBoxColumn Save;
         private DataGridViewCheckBoxColumn Update;
         private DataGridViewCheckBoxColumn Delete;
+        private DataGridView EntityGrid;
     }
 }

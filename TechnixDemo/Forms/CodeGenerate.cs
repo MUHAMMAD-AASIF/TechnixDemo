@@ -1,4 +1,3 @@
-using TechnixDemo.Helper;
 using TechnixDemo.Service;
 using TechnixDemo.Model;
 using System.Security.Cryptography.X509Certificates;
@@ -14,6 +13,7 @@ namespace TechnixDemo
         private bool isDragging = false;
         private Point startPoint = new Point(0, 0);
         public string ServerName = string.Empty;
+        public ProjectResponseModel projectResponseModel = new ProjectResponseModel();
         public CodeG()
         {
             InitializeComponent();
@@ -104,14 +104,14 @@ namespace TechnixDemo
             string SolutionName = SolNmTxt.Text;
             string ProjectName = ProcNmTxt.Text;
             string ProjectPath = folderpathTxt.Text;
-            var res = await generateService.GenerateAPIProject(SolutionName, ProjectName, ProjectPath);
-
+            var res = await generateService.GenerateAPIProjectAsync(SolutionName, ProjectName, ProjectPath);
+            projectResponseModel = res;
             if (res.Status)
             {
                 ControllerPathTxt.Text = res.ControllerPath;
                 ServicePathTxt.Text = res.ServicePath;
                 ModelPathTxt.Text = res.ModelPath;
-                ProjectDir.Text=res.ProjectPath;
+                ProjectDir.Text = res.ProjectPath;
                 ExistingProject_Click(sender, e);
 
                 MessageBox.Show("Project Created Successfully");
@@ -213,15 +213,8 @@ namespace TechnixDemo
 
         private void runEntity_Click(object sender, EventArgs e)
         {
-            EntityData entityData = new EntityData();
+            EntityData entityData = new EntityData(projectResponseModel, this);
             entityData.Show();
-            //GenerateService generateService = new GenerateService(StatusGrid, ProcessProgress);
-            //string SolutionName = SolNmTxt.Text;
-            //string ProjectName = ProcNmTxt.Text;
-            //string ProjectPath = folderpathTxt.Text;
-            //var res = generateService.GetTableNames("Server=HQAPEW1C002-AUZ;Database=technix;User Id=sa;Password=msc123;TrustServerCertificate=True;");
-
-
         }
     }
 }

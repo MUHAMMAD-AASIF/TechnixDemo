@@ -23,66 +23,158 @@ namespace TechnixDemo.Service
             _progressBar = progressBar;
         }
 
-        public async Task<ProjectResponceModel> GenerateAPIProject(string solutionName, string projectName, string outputPath)
+        public async Task<ProjectResponseModel> GenerateAPIProjectAsync(string solutionName, string projectName, string outputPath)
         {
-            ProjectResponceModel responceModel = new ProjectResponceModel();
+            var responseModel = new ProjectResponseModel();
+
             if (string.IsNullOrWhiteSpace(solutionName) || string.IsNullOrWhiteSpace(projectName) || string.IsNullOrWhiteSpace(outputPath))
             {
                 Console.WriteLine("Solution name, project name, and output path cannot be empty.");
+                responseModel.Status = false;
+                return responseModel;
             }
-            
-                try
+
+            try
+            {
+                UpdateProgress(1);
+                UpdateDataGridView("Create Solution", "Started");
+
+                var solutionDirectory = Path.Combine(outputPath, solutionName);
+                if (!Directory.Exists(solutionDirectory))
                 {
-                    UpdateProgress(1);
-                    System.Threading.Thread.Sleep(1000); // Simulate work
-                    UpdateDataGridView("Create Solution", "Started");
-                    var solutionDirectory = Path.Combine(outputPath, solutionName);
-                    if (!Directory.Exists(solutionDirectory))
+                    Directory.CreateDirectory(solutionDirectory);
+                }
+                responseModel.SolutionPath = solutionDirectory;
+                await ExecuteDotnetCommandAsync($"new sln --name Msc.{solutionName}.Service", solutionDirectory);
+                UpdateDataGridView("Create Solution", "Completed");
+                UpdateProgress(5);
+
+                // Create Web API Project
+                UpdateDataGridView("Create Web API Project", "Started");
+                var webApiProjectDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api");
+                responseModel.ProjectPath = webApiProjectDirectory;
+                await ExecuteDotnetCommandAsync($"new webapi --name Msc.{projectName}.Service.Api", solutionDirectory);
+                UpdateDataGridView("Create Web API Project", "Completed");
+                UpdateProgress(15);
+
+                // Create Blazor Server Project
+                UpdateDataGridView("Create Blazor Server Project", "Started");
+                var blazorServerProjectDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Client");
+                await ExecuteDotnetCommandAsync($"new blazorserver --name Msc.{projectName}.Client", solutionDirectory);
+                UpdateDataGridView("Create Blazor Server Project", "Completed");
+                UpdateProgress(25);
+
+                // Create Class Library Projects
+                var classLibraryNames = new[] { "Business", "Business.Contracts", "CommonModel", "DataAccess", "DataAccess.Contracts" };
+                foreach (var libraryName in classLibraryNames)
+                {
+                    UpdateDataGridView($"Create {libraryName} Class Library", "Started");
+                    var classLibraryDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{libraryName}");
+                    await ExecuteDotnetCommandAsync($"new classlib --name Msc.{projectName}.Service.{libraryName}", solutionDirectory);
+                    UpdateDataGridView($"Create {libraryName} Class Library", "Completed");
+                    UpdateProgress(25 + Array.IndexOf(classLibraryNames, libraryName) * 10);
+                }
+
+                // Create NUnit Test Projects
+                var testProjectNames = new[] { "Api", "Business" };
+                foreach (var testName in testProjectNames)
+                {
+                    UpdateDataGridView($"Create NUnit {testName} Test Project", "Started");
+                    var testProjectDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{testName}.Test");
+                    await ExecuteDotnetCommandAsync($"new nunit --name Msc.{projectName}.Service.{testName}.Test", solutionDirectory);
+                    UpdateDataGridView($"Create NUnit {testName} Test Project", "Completed");
+                }
+                UpdateProgress(55);
+
+                // Add projects to solution
+                UpdateDataGridView("Add Projects to Solution", "Started");
+                var projectPaths = new List<string>
                     {
-                        Directory.CreateDirectory(solutionDirectory);
-                    }
-                    responceModel.SolutionPath = solutionDirectory;
-                    ExecuteDotnetCommand($"new sln --name {solutionName}", solutionDirectory);
-                    UpdateDataGridView("Create Solution", "Completed");
-                    UpdateProgress(5);
+                        Path.Combine(webApiProjectDirectory, $"{projectName}.Api.csproj"),
+                        Path.Combine(blazorServerProjectDirectory, $"{projectName}.BlazorServer.csproj"),
+                        Path.Combine(solutionDirectory, $"{projectName}.Business", $"{projectName}.Business.csproj"),
+                        Path.Combine(solutionDirectory, $"{projectName}.Business.Contracts", $"{projectName}.Business.Contracts.csproj"),
+                        Path.Combine(solutionDirectory, $"{projectName}.CommonModel", $"{projectName}.CommonModel.csproj"),
+                        Path.Combine(solutionDirectory, $"{projectName}.DataAccess", $"{projectName}.DataAccess.csproj"),
+                        Path.Combine(solutionDirectory, $"{projectName}.DataAccess.Contracts", $"{projectName}.DataAccess.Contracts.csproj"),
+                        Path.Combine(solutionDirectory, $"{projectName}.Api.Tests", $"{projectName}.Api.Tests.csproj"),
+                        Path.Combine(solutionDirectory, $"{projectName}.Business.Tests", $"{projectName}.Business.Tests.csproj")
+                    };
 
-                    UpdateDataGridView("Create Web API Project", "Started");
-                    var projectDirectory = Path.Combine(solutionDirectory, projectName);
-                    responceModel.ProjectPath = projectDirectory;
-                    ExecuteDotnetCommand($"new webapi --name {projectName}", solutionDirectory);
-                    UpdateDataGridView("Create Web API Project", "Completed");
-                    UpdateProgress(20);
-
-                    UpdateDataGridView("Add Project to Solution", "Started");
-                    ExecuteDotnetCommand($"sln {solutionName}.sln add {Path.Combine(projectDirectory, $"{projectName}.csproj")}", solutionDirectory);
-                    UpdateDataGridView("Add Project to Solution", "Completed");
-                    UpdateProgress(25);
-
-                    UpdateDataGridView("Create Project Folders", "Started");
-                    var getPaths = CreateProjectFolders(projectDirectory);
-                    responceModel.ControllerPath = getPaths.ControllerPath;
-                    responceModel.ServicePath = getPaths.ServicePath;
-                    responceModel.ModelPath = getPaths.ModelPath;
-                    UpdateDataGridView("Create Project Folders", "Completed");
-                    UpdateProgress(35);
-
-                    UpdateDataGridView("Open Solution", "Started");
-                    OpenSolutionFile(solutionDirectory, solutionName);
-                    UpdateDataGridView("Open Solution", "Completed");
-                    UpdateProgress(40);
-                    responceModel.Status = true;
-                }
-                catch (Exception ex)
+                foreach (var projectPath in projectPaths)
                 {
-                    UpdateDataGridView("Error", ex.Message);
-                    responceModel.Status = false;
+                    await ExecuteDotnetCommandAsync($"sln {solutionName}.sln add {projectPath}", solutionDirectory);
                 }
-            
-            return responceModel;
+                UpdateDataGridView("Add Projects to Solution", "Completed");
+                UpdateProgress(80);
 
+                // Create Project Folders (for Web API Project)
+                UpdateDataGridView("Create Project Folders", "Started");
+                var getPaths = CreateProjectFolders(webApiProjectDirectory);
+                responseModel.ControllerPath = getPaths.ControllerPath;
+                responseModel.ServicePath = getPaths.ServicePath;
+                responseModel.ModelPath = getPaths.ModelPath;
+                UpdateDataGridView("Create Project Folders", "Completed");
+                UpdateProgress(90);
+
+                // Add References Between Projects
+                await AddReferencesBetweenProjects(solutionDirectory, projectName, classLibraryNames);
+                await AddTestProjectReferences(solutionDirectory, projectName, testProjectNames, classLibraryNames);
+
+                // Open Solution
+                UpdateDataGridView("Open Solution", "Started");
+                OpenSolutionFile(solutionDirectory, solutionName);
+                UpdateDataGridView("Open Solution", "Completed");
+                UpdateProgress(100);
+
+                responseModel.Status = true;
+            }
+            catch (Exception ex)
+            {
+                UpdateDataGridView("Error", ex.Message);
+                responseModel.Status = false;
+            }
+
+            return responseModel;
         }
 
-        
+
+        private async Task AddReferencesBetweenProjects(string solutionDirectory, string projectName, string[] classLibraryProjects)
+        {
+            foreach (var lib in classLibraryProjects)
+            {
+                var libProjectPath = Path.Combine(solutionDirectory, $"{projectName}.{lib}", $"{projectName}.{lib}.csproj");
+                foreach (var refLib in classLibraryProjects)
+                {
+                    if (lib != refLib)
+                    {
+                        var refProjectPath = Path.Combine(solutionDirectory, $"{projectName}.{refLib}", $"{projectName}.{refLib}.csproj");
+                        await ExecuteDotnetCommandAsync($"add {libProjectPath} reference {refProjectPath}", solutionDirectory);
+                    }
+                }
+                // Add references to the Web API project
+                var apiProjectPath = Path.Combine(solutionDirectory, $"{projectName}.Api", $"{projectName}.Api.csproj");
+                await ExecuteDotnetCommandAsync($"add {apiProjectPath} reference {libProjectPath}", solutionDirectory);
+            }
+        }
+
+        private async Task AddTestProjectReferences(string solutionDirectory, string projectName, string[] testProjects, string[] classLibraryProjects)
+        {
+            foreach (var test in testProjects)
+            {
+                var testProjectPath = Path.Combine(solutionDirectory, $"{projectName}.{test}.Tests", $"{projectName}.{test}.Tests.csproj");
+                string targetProjectName = test;
+                var targetProjectPath = Path.Combine(solutionDirectory, $"{projectName}.{targetProjectName}", $"{projectName}.{targetProjectName}.csproj");
+
+                if (targetProjectName == "Api")
+                {
+                    targetProjectPath = Path.Combine(solutionDirectory, $"{projectName}.Api", $"{projectName}.Api.csproj");
+                }
+
+                await ExecuteDotnetCommandAsync($"add {testProjectPath} reference {targetProjectPath}", solutionDirectory);
+            }
+        }
+
 
         private void UpdateDataGridView(string step, string status)
         {
@@ -143,11 +235,11 @@ namespace TechnixDemo.Service
             }
         }
 
-        
 
-        private ProjectResponceModel CreateProjectFolders(string projectDirectory)
+
+        private ProjectResponseModel CreateProjectFolders(string projectDirectory)
         {
-            ProjectResponceModel responceModel = new ProjectResponceModel();
+            ProjectResponseModel responceModel = new ProjectResponseModel();
             var apiPath = Path.Combine(projectDirectory, "API");
             var controllersPath = Path.Combine(apiPath, "Controllers");
             var businessPath = Path.Combine(projectDirectory, "Business");
@@ -171,33 +263,36 @@ namespace TechnixDemo.Service
         }
 
 
-        private void ExecuteDotnetCommand(string arguments, string workingDirectory)
+        private async Task ExecuteDotnetCommandAsync(string command, string workingDirectory)
         {
-            var process = new Process
+            using (var process = new Process())
             {
-                StartInfo = new ProcessStartInfo
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.Arguments = $"/C dotnet {command}";
+                process.StartInfo.WorkingDirectory = workingDirectory;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+
+                var outputBuilder = new StringBuilder();
+                var errorBuilder = new StringBuilder();
+
+                process.OutputDataReceived += (sender, args) => outputBuilder.AppendLine(args.Data);
+                process.ErrorDataReceived += (sender, args) => errorBuilder.AppendLine(args.Data);
+
+                process.Start();
+
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                await process.WaitForExitAsync();
+
+                if (process.ExitCode != 0)
                 {
-                    FileName = "dotnet",
-                    Arguments = arguments,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WorkingDirectory = workingDirectory,
+                    var errorOutput = errorBuilder.ToString();
+                    throw new Exception($"Dotnet command failed with exit code {process.ExitCode}: {errorOutput}");
                 }
-            };
-
-            process.Start();
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
-            {
-                Console.WriteLine($"Command: dotnet {arguments}");
-                Console.WriteLine($"Output: {output}");
-                Console.WriteLine($"Error: {error}");
-                throw new InvalidOperationException($"Dotnet command failed: {error}");
             }
         }
     }
