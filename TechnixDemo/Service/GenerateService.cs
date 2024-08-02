@@ -79,7 +79,7 @@ namespace TechnixDemo.Service
                 var testProjectNames = new[] { "Api", "Business" };
                 foreach (var testName in testProjectNames)
                 {
-                    UpdateDataGridView($"Create NUnit {testName} Test Project", "Started");
+                    UpdateDataGridView($"Create NUnit Msc.{testName} Test Project", "Started");
                     var testProjectDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{testName}.Test");
                     await ExecuteDotnetCommandAsync($"new nunit --name Msc.{projectName}.Service.{testName}.Test", solutionDirectory);
                     UpdateDataGridView($"Create NUnit {testName} Test Project", "Completed");
@@ -89,21 +89,21 @@ namespace TechnixDemo.Service
                 // Add projects to solution
                 UpdateDataGridView("Add Projects to Solution", "Started");
                 var projectPaths = new List<string>
-                    {
-                        Path.Combine(webApiProjectDirectory, $"{projectName}.Api.csproj"),
-                        Path.Combine(blazorServerProjectDirectory, $"{projectName}.BlazorServer.csproj"),
-                        Path.Combine(solutionDirectory, $"{projectName}.Business", $"{projectName}.Business.csproj"),
-                        Path.Combine(solutionDirectory, $"{projectName}.Business.Contracts", $"{projectName}.Business.Contracts.csproj"),
-                        Path.Combine(solutionDirectory, $"{projectName}.CommonModel", $"{projectName}.CommonModel.csproj"),
-                        Path.Combine(solutionDirectory, $"{projectName}.DataAccess", $"{projectName}.DataAccess.csproj"),
-                        Path.Combine(solutionDirectory, $"{projectName}.DataAccess.Contracts", $"{projectName}.DataAccess.Contracts.csproj"),
-                        Path.Combine(solutionDirectory, $"{projectName}.Api.Tests", $"{projectName}.Api.Tests.csproj"),
-                        Path.Combine(solutionDirectory, $"{projectName}.Business.Tests", $"{projectName}.Business.Tests.csproj")
-                    };
+            {
+                Path.Combine(webApiProjectDirectory, $"Msc.{projectName}.Service.Api.csproj"),
+                Path.Combine(blazorServerProjectDirectory, $"Msc.{projectName}.Client.csproj"),
+                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business", $"Msc.{projectName}.Service.Business.csproj"),
+                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Contracts", $"Msc.{projectName}.Service.Business.Contracts.csproj"),
+                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.CommonModel", $"Msc.{projectName}.Service.CommonModel.csproj"),
+                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.DataAccess", $"Msc.{projectName}.Service.DataAccess.csproj"),
+                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.DataAccess.Contracts", $"Msc.{projectName}.Service.DataAccess.Contracts.csproj"),
+                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api.Test", $"Msc.{projectName}.Service.Api.Test.csproj"),
+                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Test", $"Msc.{projectName}.Service.Business.Test.csproj")
+            };
 
                 foreach (var projectPath in projectPaths)
                 {
-                    await ExecuteDotnetCommandAsync($"sln {solutionName}.sln add {projectPath}", solutionDirectory);
+                    await ExecuteDotnetCommandAsync($"sln {Path.Combine(solutionDirectory, $"Msc.{solutionName}.Service.sln")} add {projectPath}", solutionDirectory);
                 }
                 UpdateDataGridView("Add Projects to Solution", "Completed");
                 UpdateProgress(80);
@@ -123,7 +123,7 @@ namespace TechnixDemo.Service
 
                 // Open Solution
                 UpdateDataGridView("Open Solution", "Started");
-                OpenSolutionFile(solutionDirectory, solutionName);
+                OpenSolutionFile(solutionDirectory, $"Msc.{solutionName}.Service");
                 UpdateDataGridView("Open Solution", "Completed");
                 UpdateProgress(100);
 
@@ -143,17 +143,17 @@ namespace TechnixDemo.Service
         {
             foreach (var lib in classLibraryProjects)
             {
-                var libProjectPath = Path.Combine(solutionDirectory, $"{projectName}.{lib}", $"{projectName}.{lib}.csproj");
+                var libProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{lib}", $"Msc.{projectName}.Service.{lib}.csproj");
                 foreach (var refLib in classLibraryProjects)
                 {
                     if (lib != refLib)
                     {
-                        var refProjectPath = Path.Combine(solutionDirectory, $"{projectName}.{refLib}", $"{projectName}.{refLib}.csproj");
+                        var refProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{refLib}", $"Msc.{projectName}.Service.{refLib}.csproj");
                         await ExecuteDotnetCommandAsync($"add {libProjectPath} reference {refProjectPath}", solutionDirectory);
                     }
                 }
                 // Add references to the Web API project
-                var apiProjectPath = Path.Combine(solutionDirectory, $"{projectName}.Api", $"{projectName}.Api.csproj");
+                var apiProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api", $"Msc.{projectName}.Service.Api.csproj");
                 await ExecuteDotnetCommandAsync($"add {apiProjectPath} reference {libProjectPath}", solutionDirectory);
             }
         }
@@ -162,13 +162,13 @@ namespace TechnixDemo.Service
         {
             foreach (var test in testProjects)
             {
-                var testProjectPath = Path.Combine(solutionDirectory, $"{projectName}.{test}.Tests", $"{projectName}.{test}.Tests.csproj");
+                var testProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{test}.Test", $"Msc.{projectName}.Service.{test}.Test.csproj");
                 string targetProjectName = test;
-                var targetProjectPath = Path.Combine(solutionDirectory, $"{projectName}.{targetProjectName}", $"{projectName}.{targetProjectName}.csproj");
+                var targetProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{targetProjectName}", $"Msc.{projectName}.Service.{targetProjectName}.csproj");
 
                 if (targetProjectName == "Api")
                 {
-                    targetProjectPath = Path.Combine(solutionDirectory, $"{projectName}.Api", $"{projectName}.Api.csproj");
+                    targetProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api", $"Msc.{projectName}.Service.Api.csproj");
                 }
 
                 await ExecuteDotnetCommandAsync($"add {testProjectPath} reference {targetProjectPath}", solutionDirectory);
@@ -239,7 +239,7 @@ namespace TechnixDemo.Service
 
         private ProjectResponseModel CreateProjectFolders(string projectDirectory)
         {
-            ProjectResponseModel responceModel = new ProjectResponseModel();
+            var responceModel = new ProjectResponseModel();
             var apiPath = Path.Combine(projectDirectory, "API");
             var controllersPath = Path.Combine(apiPath, "Controllers");
             var businessPath = Path.Combine(projectDirectory, "Business");

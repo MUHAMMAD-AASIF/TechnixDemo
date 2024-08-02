@@ -369,7 +369,7 @@
             folderpathbtn.Location = new Point(870, 166);
             folderpathbtn.Margin = new Padding(4, 5, 4, 5);
             folderpathbtn.Name = "folderpathbtn";
-            folderpathbtn.Size = new Size(50, 32);
+            folderpathbtn.Size = new Size(50, 33);
             folderpathbtn.TabIndex = 17;
             folderpathbtn.Text = "....";
             folderpathbtn.UseVisualStyleBackColor = false;
