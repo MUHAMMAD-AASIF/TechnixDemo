@@ -1,5 +1,8 @@
-﻿using System;
+﻿//using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -10,13 +13,19 @@ namespace TechnixDemo.Service
 {
     public class DatabaseHelper
     {
-        public List<string> GetTableNames(string connectionString)
+        private readonly string _connectionString;
+
+        public DatabaseHelper()
+        {
+            _connectionString = Program.Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
+        }
+        public List<string> GetTableNames()
         {
             var tableNames = new List<string>();
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
 

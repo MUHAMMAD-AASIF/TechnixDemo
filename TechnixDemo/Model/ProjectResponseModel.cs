@@ -10,12 +10,15 @@ namespace TechnixDemo.Model
     {
         public string SolutionPath { get; set; }=string.Empty;
         public string ProjectPath { get; set; } = string.Empty;
-        public string ControllerPath { get; set; } = string.Empty;
-        public string ServicePath { get; set; } = string.Empty;
-        public string InterfacePath { get; set; } = string.Empty;
-        public string ModelPath { get; set; } = string.Empty;
+        public string APIPath { get; set; } = string.Empty;
+        public string BusinessPath { get; set; } = string.Empty;
+        public string BusinessContractPath { get; set; } = string.Empty;
+        public string DataAccessPath { get; set; } = string.Empty;
+        public string DataAccessContractPath { get; set; } = string.Empty;
+        public string CommonModelPath { get; set; } = string.Empty;
+        public string APITestPath { get; set; } = string.Empty;
+        public string BusinessTestPath { get; set; } = string.Empty;
         public bool Status {  get; set; } = false;
-        public Dictionary<string, string> ClassLibraryPaths { get; set; } = new Dictionary<string, string>();
 
     }
 }

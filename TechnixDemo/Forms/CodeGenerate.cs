@@ -17,10 +17,6 @@ namespace TechnixDemo
         public CodeG()
         {
             InitializeComponent();
-            // Add event handlers for mouse events
-            this.MouseDown += new MouseEventHandler(MainForm_MouseDown);
-            this.MouseMove += new MouseEventHandler(MainForm_MouseMove);
-            this.MouseUp += new MouseEventHandler(MainForm_MouseUp);
             // Set up the ProgressBar
             ProcessProgress.Minimum = 0;
             ProcessProgress.Maximum = 100;
@@ -39,68 +35,36 @@ namespace TechnixDemo
             ConStrTxt.Text = DbCon;
 
         }
-        //public async void GetEntityDt()
-        //{
-        //    Helper.ApiHelper db = new Helper.ApiHelper();
-        //    var tst = await db.GetClientDt();
-        //    BindingSource bs = new BindingSource();
-        //    bs.DataSource = tst;
-        //    EntityCB.DataSource = bs;
-        //}
-
-        //private void Generate_Click(object sender, EventArgs e)
-        //{
-        //    Helper.ApiHelper db = new Helper.ApiHelper();
-        //    GenerateModel generateModel = new GenerateModel()
-        //    {
-        //        EntityName = EntityCB.Text,
-        //    };
-        //    var rs = db.PostClientDt(generateModel);
-        //    if (rs.Result == true)
-        //    {
-        //        MessageBox.Show("Entity Successfully Created");
-        //    }
-        //}
 
         private void NewProject_Click(object sender, EventArgs e)
         {
             this.NewPanel.Visible = true;
             this.NewProject.BackColor = Color.Khaki;
+            this.FrontPanel.Visible = true;
             this.ExistingPanel.Visible = false;
             this.ExistingProject.BackColor = Color.White;
         }
 
         private void ExistingProject_Click(object sender, EventArgs e)
         {
-            this.NewPanel.Visible = false;
+            this.FrontPanel.Visible = false;
+            this.NewPanel.Visible = true;
             this.NewProject.BackColor = Color.White;
-            this.ExistingPanel.Visible = true;
+            this.ExistingPanel.Visible = false;
             this.ExistingProject.BackColor = Color.Khaki;
 
         }
 
         private void folderpathbtn_Click(object sender, EventArgs e)
         {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                // Optional: Set the dialog's description and initial directory
-                folderBrowserDialog.Description = "Select a folder";
-                folderBrowserDialog.SelectedPath = "C:\\";
-
-                // Show the dialog and get the result
-                DialogResult result = folderBrowserDialog.ShowDialog();
-
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
-                {
-                    // Set the selected folder path in the TextBox
-                    folderpathTxt.Text = folderBrowserDialog.SelectedPath;
-                }
-            }
+            SelectFolder(folderpathTxt);
         }
 
         private async void GenProcBtn_Click(object sender, EventArgs e)
         {
             GenerateService generateService = new GenerateService(StatusGrid, ProcessProgress);
+            this.NewPanel.Visible = false;
+            this.ExistingPanel.Visible = true;
             string SolutionName = SolNmTxt.Text;
             string ProjectName = ProcNmTxt.Text;
             string ProjectPath = folderpathTxt.Text;
@@ -108,113 +72,154 @@ namespace TechnixDemo
             projectResponseModel = res;
             if (res.Status)
             {
-                ControllerPathTxt.Text = res.ControllerPath;
-                ServicePathTxt.Text = res.ServicePath;
-                ModelPathTxt.Text = res.ModelPath;
-                ProjectDir.Text = res.ProjectPath;
+                APIPathTxt.Text = res.APIPath;
+                BusinessPathTxt.Text = res.BusinessPath;
+                BusinessContractPathTxt.Text = res.BusinessContractPath;
+                DataAccessPathTxt.Text = res.DataAccessPath;
+                DataContractPathTxt.Text = res.DataAccessContractPath;
+                CommonModelPathTxt.Text = res.CommonModelPath;
+                APITestPathTxt.Text = res.APITestPath;
+                BusinessTestPathTxt.Text = res.BusinessTestPath;
+                SolutionPath.Text = res.SolutionPath;
+                projectResponseModel = res;
+                this.NewPanel.Visible = true;
+                this.FrontPanel.Visible = false;
+                this.ExistingPanel.Visible = false;
+
                 ExistingProject_Click(sender, e);
 
                 MessageBox.Show("Project Created Successfully");
             }
         }
 
-        private void Config_Click(object sender, EventArgs e)
-        {
-            DatabaseConfig dbconfig = new DatabaseConfig(this);
-
-            // To open the form as a non-modal form (the user can interact with both forms):
-            dbconfig.Show();
-        }
-
-
-
-        private void MainForm_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                isDragging = true;
-                startPoint = new Point(e.X, e.Y);
-            }
-        }
-
-        private void MainForm_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (isDragging)
-            {
-                Point p = PointToScreen(e.Location);
-                this.Location = new Point(p.X - startPoint.X, p.Y - startPoint.Y);
-            }
-        }
-
-        private void MainForm_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                isDragging = false;
-            }
-        }
-
-        private void SelcontrollerFPBtn_Click(object sender, EventArgs e)
-        {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                // Optional: Set the dialog's description and initial directory
-                folderBrowserDialog.Description = "Select a folder";
-                folderBrowserDialog.SelectedPath = "C:\\";
-
-                // Show the dialog and get the result
-                DialogResult result = folderBrowserDialog.ShowDialog();
-
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
-                {
-                    // Set the selected folder path in the TextBox
-                    ControllerPathTxt.Text = folderBrowserDialog.SelectedPath;
-                }
-            }
-        }
-
-        private void SelModelFPBtn_Click(object sender, EventArgs e)
-        {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                // Optional: Set the dialog's description and initial directory
-                folderBrowserDialog.Description = "Select a folder";
-                folderBrowserDialog.SelectedPath = "C:\\";
-
-                // Show the dialog and get the result
-                DialogResult result = folderBrowserDialog.ShowDialog();
-
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
-                {
-                    // Set the selected folder path in the TextBox
-                    ModelPathTxt.Text = folderBrowserDialog.SelectedPath;
-                }
-            }
-        }
-
-        private void SelServiceFPBtn_Click(object sender, EventArgs e)
-        {
-            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
-            {
-                // Optional: Set the dialog's description and initial directory
-                folderBrowserDialog.Description = "Select a folder";
-                folderBrowserDialog.SelectedPath = "C:\\";
-
-                // Show the dialog and get the result
-                DialogResult result = folderBrowserDialog.ShowDialog();
-
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
-                {
-                    // Set the selected folder path in the TextBox
-                    ServicePathTxt.Text = folderBrowserDialog.SelectedPath;
-                }
-            }
-        }
-
         private void runEntity_Click(object sender, EventArgs e)
         {
-            EntityData entityData = new EntityData(projectResponseModel, this);
-            entityData.Show();
+            var validate = ValidatePaths(projectResponseModel);
+            if (validate.IsValid)
+            {
+                EntityData entityData = new EntityData(projectResponseModel, this);
+                entityData.Show();
+            }
+            else
+            {
+                MessageBox.Show(validate.Message);
+            }
+
+        }
+
+        private static ValidatePathModel ValidatePaths(ProjectResponseModel projectResponseModel)
+        {
+            if (string.IsNullOrEmpty(projectResponseModel.SolutionPath))
+            {
+                return new ValidatePathModel { Message = "Enter the Solution Path.", IsValid = false };
+            }
+            else if (string.IsNullOrEmpty(projectResponseModel.ProjectPath))
+            {
+                return new ValidatePathModel { Message = "Enter the Project Path.", IsValid = false };
+            }
+            else if (string.IsNullOrEmpty(projectResponseModel.APIPath))
+            {
+                return new ValidatePathModel { Message = "Enter the API Path.", IsValid = false };
+            }
+            else if (string.IsNullOrEmpty(projectResponseModel.BusinessPath))
+            {
+                return new ValidatePathModel { Message = "Enter the Business Path.", IsValid = false };
+            }
+            else if (string.IsNullOrEmpty(projectResponseModel.BusinessContractPath))
+            {
+                return new ValidatePathModel { Message = "Enter the Business Contract Path.", IsValid = false };
+            }
+            else if (string.IsNullOrEmpty(projectResponseModel.DataAccessPath))
+            {
+                return new ValidatePathModel { Message = "Enter the Data Access Path.", IsValid = false };
+            }
+            else if (string.IsNullOrEmpty(projectResponseModel.DataAccessContractPath))
+            {
+                return new ValidatePathModel { Message = "Enter the Data Access Contract Path.", IsValid = false };
+            }
+            else if (string.IsNullOrEmpty(projectResponseModel.CommonModelPath))
+            {
+                return new ValidatePathModel { Message = "Enter the Common Model Path.", IsValid = false };
+            }
+            else if (string.IsNullOrEmpty(projectResponseModel.APITestPath))
+            {
+                return new ValidatePathModel { Message = "Enter the API Test Path.", IsValid = false };
+            }
+            else if (string.IsNullOrEmpty(projectResponseModel.BusinessTestPath))
+            {
+                return new ValidatePathModel { Message = "Enter the Business Test Path.", IsValid = false };
+            }
+
+            return new ValidatePathModel { Message = "All paths are valid.", IsValid = true };
+        }
+
+        private void SelectFolder(System.Windows.Forms.TextBox targetTextBox)
+        {
+            using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+            {
+                // Optional: Set the dialog's description and initial directory
+                folderBrowserDialog.Description = "Select a folder";
+                folderBrowserDialog.SelectedPath = "C:\\";
+
+                // Show the dialog and get the result
+                DialogResult result = folderBrowserDialog.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+                {
+                    // Set the selected folder path in the target TextBox
+                    targetTextBox.Text = folderBrowserDialog.SelectedPath;
+                }
+            }
+        }
+
+        private void GetPathBtn_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void SelApiFPBtn_Click(object sender, EventArgs e)
+        {
+            SelectFolder(APIPathTxt);
+        }
+
+        private void SelBusinessFPBtn_Click(object sender, EventArgs e)
+        {
+            SelectFolder(BusinessPathTxt);
+        }
+
+        private void SelBusinessCnFPBtn_Click(object sender, EventArgs e)
+        {
+            SelectFolder(BusinessContractPathTxt);
+        }
+
+        private void SelCommonMdFPBtn_Click(object sender, EventArgs e)
+        {
+            SelectFolder(CommonModelPathTxt);
+        }
+
+        private void SelDAFPBtn_Click(object sender, EventArgs e)
+        {
+            SelectFolder(DataAccessPathTxt);
+        }
+
+        private void SelDaCFPBtn_Click(object sender, EventArgs e)
+        {
+            SelectFolder(DataContractPathTxt);
+        }
+
+        private void SelApiTestFPBtn_Click(object sender, EventArgs e)
+        {
+            SelectFolder(APITestPathTxt);
+        }
+
+        private void SelBusinessTstFPBtn_Click(object sender, EventArgs e)
+        {
+            SelectFolder(BusinessTestPathTxt);
+        }
+
+        private void GetPathFPBtn_Click(object sender, EventArgs e)
+        {
+            SelectFolder(SolutionPath);
         }
     }
 }

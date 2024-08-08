@@ -17,47 +17,102 @@ namespace TechnixDemo.Forms
     {
         private List<EntitySelectModel> _entities;
         private CodeG _parentForm;
+        private BindingList<EntitySelectModel> _bindingList;
+        private readonly ProjectResponseModel _filepathRes;
 
         public EntityData(ProjectResponseModel filepathRes, CodeG parentForm)
         {
-           
+
             InitializeComponent();
-            DatabaseHelper dbHelper = new DatabaseHelper();
-            var res = dbHelper.GetTableNames("Server=HQAPEW1C002-AUZ;Database=technix;User Id=sa;Password=msc123;TrustServerCertificate=True;");
+            _filepathRes=filepathRes;
             _parentForm = parentForm;
             _entities = new List<EntitySelectModel>();
 
-            foreach (var name in res)
+            DatabaseHelper db = new DatabaseHelper();
+            var entityNames = db.GetTableNames();
+            _bindingList = new BindingList<EntitySelectModel>();
+            foreach (var name in entityNames)
             {
-                _entities.Add(new EntitySelectModel { Entity = name });
+                _bindingList.Add(new EntitySelectModel { Entity = name });
             }
-
             // Bind data to DataGridView
-            EntityGrid.DataSource = new BindingList<EntitySelectModel>(_entities);
+            EntityGrid.DataSource = _bindingList;
             EntityGrid.Columns["Entity"].ReadOnly = true;
-
-            // Subscribe to events
-            EntityGrid.CellValueChanged += dataGridView_CellValueChanged;
-            EntityGrid.CurrentCellDirtyStateChanged += dataGridView_CurrentCellDirtyStateChanged;
+            // Set the boolean columns to be checkbox columns
+            foreach (DataGridViewColumn column in EntityGrid.Columns)
+            {
+                if (column.ValueType == typeof(bool))
+                {
+                    column.ReadOnly = false;
+                    column.CellTemplate = new DataGridViewCheckBoxCell();
+                    column.Width = 60;
+                }
+                else if (column.HeaderText == "Entity")
+                {
+                    column.ReadOnly = true;
+                    column.Width = 150; // Optionally set the width for the Entity column
+                }
+            }
+            EntityGrid.CellContentClick += dataGridView_CellContentClick;
 
         }
 
-        private void dataGridView_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+
+        private void dataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (EntityGrid.IsCurrentCellDirty)
+            if (e.RowIndex >= 0 && EntityGrid.Columns[e.ColumnIndex] is DataGridViewCheckBoxColumn)
             {
-                EntityGrid.CommitEdit(DataGridViewDataErrorContexts.Commit);
+                EntityGrid.EndEdit(); // Commit the change to the data source
+                var updatedModel = _bindingList[e.RowIndex];
+
+                switch (e.ColumnIndex)
+                {
+                    case 0: // Select
+                        updatedModel.Select = !updatedModel.Select;
+                        updatedModel.GetAll = !updatedModel.GetAll;
+                        updatedModel.GetById = !updatedModel.GetById;
+                        updatedModel.Save = !updatedModel.Save;
+                        updatedModel.Update = !updatedModel.Update;
+                        updatedModel.Delete = !updatedModel.Delete;
+                        break;
+                    case 2: // GetAll
+                        updatedModel.GetAll = !updatedModel.GetAll;
+                        break;
+                    case 3: // GetById
+                        updatedModel.GetById = !updatedModel.GetById;
+                        break;
+                    case 4: // Save
+                        updatedModel.Save = !updatedModel.Save;
+                        break;
+                    case 5: // Update
+                        updatedModel.Update = !updatedModel.Update;
+                        break;
+                    case 6: // Delete
+                        updatedModel.Delete = !updatedModel.Delete;
+                        break;
+                }
+
+                // Refresh the DataGridView to reflect changes
+                EntityGrid.Refresh();
             }
         }
 
-        private void dataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            // Handle cell value changes if needed
-        }
-
-
+        //private void btnSubmit_Click(object sender, EventArgs e)
+        //{
+        //    var selectedModels = _bindingList.ToList();
+        //    _parentForm.HandleSelectedEntities(selectedModels);
+        //    this.Close();
+        //}
         private void Close_Click(object sender, EventArgs e)
         {
+            this.Close();
+        }
+
+        private void Generate_Click(object sender, EventArgs e)
+        {
+            var selectedModels = _bindingList.ToList();
+            var Filepath = _filepathRes;
+            //_parentForm.HandleSelectedEntities(selectedModels);
             this.Close();
         }
     }

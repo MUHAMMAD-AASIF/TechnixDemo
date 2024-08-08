@@ -89,17 +89,17 @@ namespace TechnixDemo.Service
                 // Add projects to solution
                 UpdateDataGridView("Add Projects to Solution", "Started");
                 var projectPaths = new List<string>
-            {
-                Path.Combine(webApiProjectDirectory, $"Msc.{projectName}.Service.Api.csproj"),
-                Path.Combine(blazorServerProjectDirectory, $"Msc.{projectName}.Client.csproj"),
-                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business", $"Msc.{projectName}.Service.Business.csproj"),
-                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Contracts", $"Msc.{projectName}.Service.Business.Contracts.csproj"),
-                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.CommonModel", $"Msc.{projectName}.Service.CommonModel.csproj"),
-                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.DataAccess", $"Msc.{projectName}.Service.DataAccess.csproj"),
-                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.DataAccess.Contracts", $"Msc.{projectName}.Service.DataAccess.Contracts.csproj"),
-                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api.Test", $"Msc.{projectName}.Service.Api.Test.csproj"),
-                Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Test", $"Msc.{projectName}.Service.Business.Test.csproj")
-            };
+                {
+                    Path.Combine(webApiProjectDirectory, $"Msc.{projectName}.Service.Api.csproj"),
+                    Path.Combine(blazorServerProjectDirectory, $"Msc.{projectName}.Client.csproj"),
+                    Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business", $"Msc.{projectName}.Service.Business.csproj"),
+                    Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Contracts", $"Msc.{projectName}.Service.Business.Contracts.csproj"),
+                    Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.CommonModel", $"Msc.{projectName}.Service.CommonModel.csproj"),
+                    Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.DataAccess", $"Msc.{projectName}.Service.DataAccess.csproj"),
+                    Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.DataAccess.Contracts", $"Msc.{projectName}.Service.DataAccess.Contracts.csproj"),
+                    Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api.Test", $"Msc.{projectName}.Service.Api.Test.csproj"),
+                    Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Test", $"Msc.{projectName}.Service.Business.Test.csproj")
+                };
 
                 foreach (var projectPath in projectPaths)
                 {
@@ -110,10 +110,15 @@ namespace TechnixDemo.Service
 
                 // Create Project Folders (for Web API Project)
                 UpdateDataGridView("Create Project Folders", "Started");
-                var getPaths = CreateProjectFolders(webApiProjectDirectory);
-                responseModel.ControllerPath = getPaths.ControllerPath;
-                responseModel.ServicePath = getPaths.ServicePath;
-                responseModel.ModelPath = getPaths.ModelPath;
+                CreateProjectFolders(solutionDirectory, projectName);
+                responseModel.APIPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api");
+                responseModel.BusinessPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business");
+                responseModel.BusinessContractPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Contracts");
+                responseModel.CommonModelPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.CommonModel");
+                responseModel.DataAccessPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.DataAccess");
+                responseModel.DataAccessContractPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.DataAccess.Contracts");
+                responseModel.APITestPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.API.Test");
+                responseModel.BusinessTestPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Test");
                 UpdateDataGridView("Create Project Folders", "Completed");
                 UpdateProgress(90);
 
@@ -138,6 +143,7 @@ namespace TechnixDemo.Service
             return responseModel;
         }
 
+        #region Adding Reference between all Projects 
 
         private async Task AddReferencesBetweenProjects(string solutionDirectory, string projectName, string[] classLibraryProjects)
         {
@@ -174,7 +180,7 @@ namespace TechnixDemo.Service
                 await ExecuteDotnetCommandAsync($"add {testProjectPath} reference {targetProjectPath}", solutionDirectory);
             }
         }
-
+        #endregion
 
         private void UpdateDataGridView(string step, string status)
         {
@@ -235,33 +241,45 @@ namespace TechnixDemo.Service
             }
         }
 
-
-
-        private ProjectResponseModel CreateProjectFolders(string projectDirectory)
+        private void CreateProjectFolders(string projectDirectory, string ProjectName)
         {
-            var responceModel = new ProjectResponseModel();
-            var apiPath = Path.Combine(projectDirectory, "API");
-            var controllersPath = Path.Combine(apiPath, "Controllers");
-            var businessPath = Path.Combine(projectDirectory, "Business");
-            var servicePath = Path.Combine(businessPath, "Service");
-            var dataAccessPath = Path.Combine(projectDirectory, "DataAccess");
-            var modelsPath = Path.Combine(dataAccessPath, "Models");
+            var apiPath = Path.Combine(projectDirectory, $"Msc.{ProjectName}.Service.Api");
+            Directory.CreateDirectory(Path.Combine(apiPath, "App_Start"));
+            Directory.CreateDirectory(Path.Combine(apiPath, "Controllers"));
+            Directory.CreateDirectory(Path.Combine(apiPath, "Extension"));
+            Directory.CreateDirectory(Path.Combine(apiPath, "Helpers"));
+            Directory.CreateDirectory(Path.Combine(apiPath, "Infrastructure"));
+            Directory.CreateDirectory(Path.Combine(apiPath, "Mapping"));
+            Directory.CreateDirectory(Path.Combine(apiPath, "Resource"));
 
-            Directory.CreateDirectory(apiPath);
-            Directory.CreateDirectory(controllersPath);
-            Directory.CreateDirectory(businessPath);
-            Directory.CreateDirectory(servicePath);
-            Directory.CreateDirectory(dataAccessPath);
-            Directory.CreateDirectory(modelsPath);
+            var apiTestPath = Path.Combine(projectDirectory, $"Msc.{ProjectName}.Service.Api.Test");
+            Directory.CreateDirectory(Path.Combine(apiTestPath, "UnitTest"));
 
-            responceModel.ControllerPath = controllersPath;
-            responceModel.ServicePath = servicePath;
-            responceModel.ModelPath = modelsPath;
+            var BusinessTestPath = Path.Combine(projectDirectory, $"Msc.{ProjectName}.Service.Business.Test");
+            Directory.CreateDirectory(Path.Combine(BusinessTestPath, "UnitTest"));
 
+            var businessContractsPath = Path.Combine(projectDirectory, $"Msc.{ProjectName}.Service.Business.Contracts");
+            Directory.CreateDirectory(Path.Combine(businessContractsPath, "Interfaces"));
 
-            return responceModel;
+            var DataAccessContractsPath = Path.Combine(projectDirectory, $"Msc.{ProjectName}.Service.DataAccess.Contracts");
+            Directory.CreateDirectory(Path.Combine(BusinessTestPath, "Interfaces"));
         }
 
+        private string GetPropertyType(string clrType)
+        {
+            switch (clrType)
+            {
+                case "String": return "string";
+                case "Int32": return "int";
+                case "Int64": return "long";
+                case "Double": return "double";
+                case "Decimal": return "decimal";
+                case "Boolean": return "bool";
+                case "DateTime": return "DateTime";
+                // Add more cases as needed
+                default: return clrType;
+            }
+        }
 
         private async Task ExecuteDotnetCommandAsync(string command, string workingDirectory)
         {
