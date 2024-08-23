@@ -52,9 +52,9 @@ namespace TechnixDemo.Service
             return tableNames;
         }
 
-        public List<string> GetColumnNames(string connectionString, string tableName)
+        public Dictionary<string, string> GetColumnNamesAndDataTypes(string connectionString, string tableName)
         {
-            var columnNames = new List<string>();
+            var columnData = new Dictionary<string, string>();
 
             try
             {
@@ -62,11 +62,10 @@ namespace TechnixDemo.Service
                 {
                     connection.Open();
 
-                    // Query to get column names for a specific table
-                    string query = @"
-                    SELECT COLUMN_NAME 
-                    FROM INFORMATION_SCHEMA.COLUMNS 
-                    WHERE TABLE_NAME = @TableName";
+                    // Query to get column names and their data types for a specific table
+                    string query = @"SELECT COLUMN_NAME, DATA_TYPE 
+                                    FROM INFORMATION_SCHEMA.COLUMNS 
+                                    WHERE TABLE_NAME = @TableName";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
@@ -77,7 +76,8 @@ namespace TechnixDemo.Service
                             while (reader.Read())
                             {
                                 string columnName = reader["COLUMN_NAME"].ToString();
-                                columnNames.Add(columnName);
+                                string dataType = reader["DATA_TYPE"].ToString();
+                                columnData.Add(columnName, dataType);
                             }
                         }
                     }
@@ -88,7 +88,8 @@ namespace TechnixDemo.Service
                 Console.WriteLine($"An error occurred: {ex.Message}");
             }
 
-            return columnNames;
+            return columnData;
         }
+
     }
 }

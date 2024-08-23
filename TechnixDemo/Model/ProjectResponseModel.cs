@@ -8,8 +8,10 @@ namespace TechnixDemo.Model
 {
     public class ProjectResponseModel
     {
+        public string SolutionName { get; set; } = string.Empty;
         public string SolutionPath { get; set; }=string.Empty;
         public string ProjectPath { get; set; } = string.Empty;
+        public string ProjectName { get; set; } = string.Empty;
         public string APIPath { get; set; } = string.Empty;
         public string BusinessPath { get; set; } = string.Empty;
         public string BusinessContractPath { get; set; } = string.Empty;

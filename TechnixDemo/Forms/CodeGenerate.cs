@@ -62,36 +62,58 @@ namespace TechnixDemo
 
         private async void GenProcBtn_Click(object sender, EventArgs e)
         {
+            // Hide and show necessary panels
+            TogglePanels(isProcessing: true);
+
+            // Retrieve input values
+            string solutionName = SolNmTxt.Text.Trim();
+            string projectName = ProcNmTxt.Text.Trim();
+            string projectPath = folderpathTxt.Text.Trim();
+
+            // Initialize the service and generate the project
             GenerateService generateService = new GenerateService(StatusGrid, ProcessProgress);
-            this.NewPanel.Visible = false;
-            this.ExistingPanel.Visible = true;
-            string SolutionName = SolNmTxt.Text;
-            string ProjectName = ProcNmTxt.Text;
-            string ProjectPath = folderpathTxt.Text;
-            var res = await generateService.GenerateAPIProjectAsync(SolutionName, ProjectName, ProjectPath);
-            projectResponseModel = res;
-            if (res.Status)
+            var result = await generateService.GenerateAPIProjectAsync(solutionName, projectName, projectPath);
+
+            // Update project response model
+            UpdateProjectResponseModel(result, projectName, solutionName);
+
+            // If generation was successful, update UI and notify the user
+            if (result.Status)
             {
-                APIPathTxt.Text = res.APIPath;
-                BusinessPathTxt.Text = res.BusinessPath;
-                BusinessContractPathTxt.Text = res.BusinessContractPath;
-                DataAccessPathTxt.Text = res.DataAccessPath;
-                DataContractPathTxt.Text = res.DataAccessContractPath;
-                CommonModelPathTxt.Text = res.CommonModelPath;
-                APITestPathTxt.Text = res.APITestPath;
-                BusinessTestPathTxt.Text = res.BusinessTestPath;
-                SolutionPath.Text = res.SolutionPath;
-                projectResponseModel = res;
-                this.NewPanel.Visible = true;
-                this.FrontPanel.Visible = false;
-                this.ExistingPanel.Visible = false;
+                UpdatePaths(result);
+                TogglePanels(isProcessing: false);
 
                 ExistingProject_Click(sender, e);
-
                 MessageBox.Show("Project Created Successfully");
             }
         }
 
+        private void TogglePanels(bool isProcessing)
+        {
+            NewPanel.Visible = !isProcessing;
+            FrontPanel.Visible = !isProcessing;
+            ExistingPanel.Visible = isProcessing;
+        }
+
+        private void UpdateProjectResponseModel(ProjectResponseModel result, string projectName, string solutionName)
+        {
+            projectResponseModel = result;
+            projectResponseModel.ProjectName = projectName;
+            projectResponseModel.SolutionName = solutionName;
+        }
+
+        private void UpdatePaths(ProjectResponseModel result)
+        {
+            APIPathTxt.Text = result.APIPath;
+            BusinessPathTxt.Text = result.BusinessPath;
+            BusinessContractPathTxt.Text = result.BusinessContractPath;
+            DataAccessPathTxt.Text = result.DataAccessPath;
+            DataContractPathTxt.Text = result.DataAccessContractPath;
+            CommonModelPathTxt.Text = result.CommonModelPath;
+            APITestPathTxt.Text = result.APITestPath;
+            BusinessTestPathTxt.Text = result.BusinessTestPath;
+            SolutionPath.Text = result.SolutionPath;
+        }
         private void runEntity_Click(object sender, EventArgs e)
         {
             var validate = ValidatePaths(projectResponseModel);
@@ -113,10 +135,7 @@ namespace TechnixDemo
             {
                 return new ValidatePathModel { Message = "Enter the Solution Path.", IsValid = false };
             }
-            else if (string.IsNullOrEmpty(projectResponseModel.ProjectPath))
-            {
-                return new ValidatePathModel { Message = "Enter the Project Path.", IsValid = false };
-            }
+            
             else if (string.IsNullOrEmpty(projectResponseModel.APIPath))
             {
                 return new ValidatePathModel { Message = "Enter the API Path.", IsValid = false };
@@ -174,7 +193,68 @@ namespace TechnixDemo
 
         private void GetPathBtn_Click(object sender, EventArgs e)
         {
+            // Combine paths and check if they exist before assigning them to text boxes.
+            var projectname = SolutionPath.Text.Substring(SolutionPath.Text.LastIndexOf("\\"), SolutionPath.Text.Length - SolutionPath.Text.LastIndexOf("\\")).Replace("\\","");
+            var apiPath = Path.Combine(SolutionPath.Text, $"Msc.{projectname}.Service.Api");
             
+            projectResponseModel.ProjectName =string.IsNullOrEmpty(SolNmTxt.Text)? projectname:SolNmTxt.Text;
+            ProcNmTxt.Text = string.IsNullOrEmpty(ProcNmTxt.Text) ? projectname : ProcNmTxt.Text;
+
+            projectResponseModel.SolutionPath = apiPath;
+            if (Directory.Exists(apiPath))
+            {
+                APIPathTxt.Text = apiPath;
+                projectResponseModel.APIPath = apiPath;
+            }
+
+            var businessPath = Path.Combine(SolutionPath.Text, $"Msc.{projectname}.Service.Business");
+            if (Directory.Exists(businessPath))
+            {
+                BusinessPathTxt.Text = businessPath;
+                projectResponseModel.BusinessPath = businessPath;
+            }
+
+            var businessContractPath = Path.Combine(SolutionPath.Text, $"Msc.{projectname}.Service.Business.Contracts");
+            if (Directory.Exists(businessContractPath))
+            {
+                BusinessContractPathTxt.Text = businessContractPath;
+                projectResponseModel.BusinessContractPath = businessContractPath;
+            }
+
+            var dataAccessPath = Path.Combine(SolutionPath.Text, $"Msc.{projectname}.Service.DataAccess");
+            if (Directory.Exists(dataAccessPath))
+            {
+                DataAccessPathTxt.Text = dataAccessPath;
+                projectResponseModel.DataAccessPath = dataAccessPath;
+            }
+
+            var dataContractPath = Path.Combine(SolutionPath.Text, $"Msc.{projectname}.Service.DataAccess.Contracts");
+            if (Directory.Exists(dataContractPath))
+            {
+                DataContractPathTxt.Text = dataContractPath;
+                projectResponseModel.DataAccessContractPath = dataContractPath;
+            }
+
+            var commonModelPath = Path.Combine(SolutionPath.Text, $"Msc.{projectname}.Service.CommonModel");
+            if (Directory.Exists(commonModelPath))
+            {
+                CommonModelPathTxt.Text = commonModelPath;
+                projectResponseModel.CommonModelPath = commonModelPath;
+            }
+
+            var apiTestPath = Path.Combine(SolutionPath.Text, $"Msc.{projectname}.Service.Api.Test");
+            if (Directory.Exists(apiTestPath))
+            {
+                APITestPathTxt.Text = apiTestPath;
+                projectResponseModel.APITestPath = apiTestPath;
+            }
+
+            var businessTestPath = Path.Combine(SolutionPath.Text, $"Msc.{projectname}.Service.Business.Test");
+            if (Directory.Exists(businessTestPath))
+            {
+                BusinessTestPathTxt.Text = businessTestPath;
+                projectResponseModel.BusinessTestPath = businessTestPath;
+            }
         }
 
         private void SelApiFPBtn_Click(object sender, EventArgs e)

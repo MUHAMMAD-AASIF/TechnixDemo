@@ -241,29 +241,62 @@ namespace TechnixDemo.Service
             }
         }
 
-        private void CreateProjectFolders(string projectDirectory, string ProjectName)
+        private void CreateProjectFolders(string projectDirectory, string projectName)
         {
-            var apiPath = Path.Combine(projectDirectory, $"Msc.{ProjectName}.Service.Api");
-            Directory.CreateDirectory(Path.Combine(apiPath, "App_Start"));
-            Directory.CreateDirectory(Path.Combine(apiPath, "Controllers"));
-            Directory.CreateDirectory(Path.Combine(apiPath, "Extension"));
-            Directory.CreateDirectory(Path.Combine(apiPath, "Helpers"));
-            Directory.CreateDirectory(Path.Combine(apiPath, "Infrastructure"));
-            Directory.CreateDirectory(Path.Combine(apiPath, "Mapping"));
-            Directory.CreateDirectory(Path.Combine(apiPath, "Resource"));
+            // API Project
+            var apiPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Api");
+            var APIlistFolder = new List<string>() {
+            "App_Start","Controllers","Extension","Helpers","Infrastructure","Mapping","Resource"
+            };
+            CreateFolderAndAddToCsproj(apiPath, APIlistFolder);
 
-            var apiTestPath = Path.Combine(projectDirectory, $"Msc.{ProjectName}.Service.Api.Test");
-            Directory.CreateDirectory(Path.Combine(apiTestPath, "UnitTest"));
+            // API Test Project
+            var apiTestPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Api.Test");
+            CreateFolderAndAddToCsproj(apiTestPath, new List<string>() {"UnitTest"});
 
-            var BusinessTestPath = Path.Combine(projectDirectory, $"Msc.{ProjectName}.Service.Business.Test");
-            Directory.CreateDirectory(Path.Combine(BusinessTestPath, "UnitTest"));
+            // Business Test Project
+            var businessTestPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Business.Test");
+            CreateFolderAndAddToCsproj(businessTestPath, new List<string>() { "UnitTest" });
 
-            var businessContractsPath = Path.Combine(projectDirectory, $"Msc.{ProjectName}.Service.Business.Contracts");
-            Directory.CreateDirectory(Path.Combine(businessContractsPath, "Interfaces"));
+            // Business Contracts Project
+            var businessContractsPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Business.Contracts");
+            CreateFolderAndAddToCsproj(businessContractsPath, new List<string>() { "Interfaces" });
 
-            var DataAccessContractsPath = Path.Combine(projectDirectory, $"Msc.{ProjectName}.Service.DataAccess.Contracts");
-            Directory.CreateDirectory(Path.Combine(BusinessTestPath, "Interfaces"));
+            // Data Access Contracts Project
+            var dataAccessContractsPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.DataAccess.Contracts");
+            CreateFolderAndAddToCsproj(dataAccessContractsPath, new List<string>() { "Interfaces" });
         }
+
+        private void CreateFolderAndAddToCsproj(string projectDirectory, List<string> forlders)
+        {
+            var itemGroup = "<ItemGroup/>\n";
+            foreach (var folderName in forlders)
+            {
+                var folderPath = Path.Combine(projectDirectory, folderName);
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                var csprojPath = Directory.GetFiles(projectDirectory, "*.csproj").FirstOrDefault();
+                if (csprojPath != null)
+                {
+                    var csprojContent = File.ReadAllText(csprojPath);
+                    
+                    var newFolder = $"<Folder Include=\"{folderName}\\\" />\n";
+                    var foldergroup = "<ItemGroup>";
+                    if (!csprojContent.Contains(newFolder))
+                    {
+                        csprojContent = csprojContent.Replace(itemGroup, itemGroup + newFolder);
+                        File.WriteAllText(csprojPath, csprojContent);
+                    }
+                }
+            }
+
+
+        }
+
+
 
         private string GetPropertyType(string clrType)
         {

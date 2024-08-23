@@ -271,7 +271,7 @@
             FrontPanel.Dock = DockStyle.Left;
             FrontPanel.Location = new Point(0, 0);
             FrontPanel.Name = "FrontPanel";
-            FrontPanel.Size = new Size(642, 418);
+            FrontPanel.Size = new Size(660, 418);
             FrontPanel.TabIndex = 74;
             // 
             // SolNmTxt
@@ -288,7 +288,7 @@
             label2.AutoSize = true;
             label2.FlatStyle = FlatStyle.Flat;
             label2.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label2.Location = new Point(35, 22);
+            label2.Location = new Point(37, 22);
             label2.Name = "label2";
             label2.Size = new Size(74, 15);
             label2.TabIndex = 32;
@@ -298,7 +298,7 @@
             // 
             ProcNmTxt.BackColor = Color.White;
             ProcNmTxt.BorderStyle = BorderStyle.FixedSingle;
-            ProcNmTxt.Location = new Point(35, 105);
+            ProcNmTxt.Location = new Point(35, 104);
             ProcNmTxt.Name = "ProcNmTxt";
             ProcNmTxt.Size = new Size(579, 23);
             ProcNmTxt.TabIndex = 31;
@@ -308,7 +308,7 @@
             label4.AutoSize = true;
             label4.FlatStyle = FlatStyle.Flat;
             label4.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label4.Location = new Point(35, 87);
+            label4.Location = new Point(37, 86);
             label4.Name = "label4";
             label4.Size = new Size(68, 15);
             label4.TabIndex = 30;
@@ -336,7 +336,7 @@
             folderpathbtn.FlatStyle = FlatStyle.Flat;
             folderpathbtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             folderpathbtn.ForeColor = Color.White;
-            folderpathbtn.Location = new Point(579, 169);
+            folderpathbtn.Location = new Point(579, 168);
             folderpathbtn.Name = "folderpathbtn";
             folderpathbtn.Size = new Size(35, 23);
             folderpathbtn.TabIndex = 29;
@@ -349,7 +349,7 @@
             label1.AutoSize = true;
             label1.FlatStyle = FlatStyle.Flat;
             label1.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label1.Location = new Point(35, 151);
+            label1.Location = new Point(37, 150);
             label1.Name = "label1";
             label1.Size = new Size(60, 15);
             label1.TabIndex = 27;
@@ -359,7 +359,7 @@
             // 
             folderpathTxt.BackColor = Color.White;
             folderpathTxt.BorderStyle = BorderStyle.FixedSingle;
-            folderpathTxt.Location = new Point(35, 169);
+            folderpathTxt.Location = new Point(35, 168);
             folderpathTxt.Name = "folderpathTxt";
             folderpathTxt.ReadOnly = true;
             folderpathTxt.Size = new Size(544, 23);

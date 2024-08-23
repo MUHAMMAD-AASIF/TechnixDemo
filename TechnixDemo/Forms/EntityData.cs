@@ -110,10 +110,13 @@ namespace TechnixDemo.Forms
 
         private void Generate_Click(object sender, EventArgs e)
         {
-            var selectedModels = _bindingList.ToList();
+            var selectedModels = _bindingList.Where(x=>x.Select).ToList();
             var Filepath = _filepathRes;
+            FileGenerateService fileGenerateService = new FileGenerateService(selectedModels, Filepath);
+            fileGenerateService.GenerateFile();
+            MessageBox.Show("Files Created Sucessfully");
             //_parentForm.HandleSelectedEntities(selectedModels);
-            this.Close();
+            //this.Close();
         }
     }
 }
