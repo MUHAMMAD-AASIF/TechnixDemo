@@ -97,12 +97,6 @@ namespace TechnixDemo.Forms
             }
         }
 
-        //private void btnSubmit_Click(object sender, EventArgs e)
-        //{
-        //    var selectedModels = _bindingList.ToList();
-        //    _parentForm.HandleSelectedEntities(selectedModels);
-        //    this.Close();
-        //}
         private void Close_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -115,8 +109,6 @@ namespace TechnixDemo.Forms
             FileGenerateService fileGenerateService = new FileGenerateService(selectedModels, Filepath);
             fileGenerateService.GenerateFile();
             MessageBox.Show("Files Created Sucessfully");
-            //_parentForm.HandleSelectedEntities(selectedModels);
-            //this.Close();
         }
     }
 }

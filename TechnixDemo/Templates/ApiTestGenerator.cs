@@ -9,7 +9,7 @@ namespace TechnixDemo.Templates
 {
     internal class ApiTestGenerator
     {
-        public string GenerateBusinessTests(EntitySelectModel entity, string ProjectName)
+        public string GenerateApiTest(EntitySelectModel entity, string ProjectName)
         {
             var testCode = new StringBuilder();
 
