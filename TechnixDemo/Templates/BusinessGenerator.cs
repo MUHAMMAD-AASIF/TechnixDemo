@@ -9,54 +9,94 @@ namespace TechnixDemo.Templates
 {
     public class BusinessGenerator
     {
-        
+
         public string GenerateBusiness(EntitySelectModel entity, string ProjectName)
         {
             var serviceCode = new StringBuilder();
 
-            serviceCode.AppendLine($"namespace YourNamespace.Business");
+            serviceCode.AppendLine($"using {ProjectName}.Models;");
+            serviceCode.AppendLine($"using {ProjectName}.Repositories;");
+            serviceCode.AppendLine("using System.Collections.Generic;");
+            serviceCode.AppendLine();
+            serviceCode.AppendLine($"namespace {ProjectName}.Business");
             serviceCode.AppendLine("{");
-            serviceCode.AppendLine($"    public class {entityName}Service : I{entityName}Service");
+            serviceCode.AppendLine($"    public class {entity.Entity}Service : I{entity.Entity}Service");
             serviceCode.AppendLine("    {");
+            serviceCode.AppendLine($"        private readonly I{entity.Entity}Repository _{entity.Entity.ToLower()}Repository;");
+            serviceCode.AppendLine();
+            serviceCode.AppendLine($"        public {entity.Entity}Service(I{entity.Entity}Repository {entity.Entity.ToLower()}Repository)");
+            serviceCode.AppendLine("        {");
+            serviceCode.AppendLine($"            _{entity.Entity.ToLower()}Repository = {entity.Entity.ToLower()}Repository;");
+            serviceCode.AppendLine("        }");
+            serviceCode.AppendLine();
 
             if (entity.GetAll)
             {
-                serviceCode.AppendLine($"        public IEnumerable<YourEntityModel> GetAll()");
+                serviceCode.AppendLine($"        public IEnumerable<{entity.Entity}Model> GetAll()");
                 serviceCode.AppendLine("        {");
-                serviceCode.AppendLine("            // Add logic to get all records");
+                serviceCode.AppendLine("            // Retrieve all records from the repository");
+                serviceCode.AppendLine($"            return _{entity.Entity.ToLower()}Repository.GetAll();");
                 serviceCode.AppendLine("        }");
+                serviceCode.AppendLine();
             }
 
             if (entity.GetById)
             {
-                serviceCode.AppendLine($"        public YourEntityModel GetById(int id)");
+                serviceCode.AppendLine($"        public {entity.Entity}Model GetById(int id)");
                 serviceCode.AppendLine("        {");
-                serviceCode.AppendLine("            // Add logic to get a record by ID");
+                serviceCode.AppendLine("            // Retrieve a single record by ID from the repository");
+                serviceCode.AppendLine($"            return _{entity.Entity.ToLower()}Repository.GetById(id);");
                 serviceCode.AppendLine("        }");
+                serviceCode.AppendLine();
             }
 
             if (entity.Save)
             {
-                serviceCode.AppendLine($"        public void Save(YourEntityModel model)");
+                serviceCode.AppendLine($"        public {entity.Entity}Model Save({entity.Entity}Model model)");
                 serviceCode.AppendLine("        {");
-                serviceCode.AppendLine("            // Add logic to save a new record");
+                serviceCode.AppendLine("            // Validate the model");
+                serviceCode.AppendLine("            if (model == null)");
+                serviceCode.AppendLine("            {");
+                serviceCode.AppendLine("                throw new ArgumentNullException(nameof(model));");
+                serviceCode.AppendLine("            }");
+                serviceCode.AppendLine();
+                serviceCode.AppendLine("            // Save the new record in the repository");
+                serviceCode.AppendLine($"            return _{entity.Entity.ToLower()}Repository.Save(model);");
                 serviceCode.AppendLine("        }");
+                serviceCode.AppendLine();
             }
 
             if (entity.Update)
             {
-                serviceCode.AppendLine($"        public void Update(int id, YourEntityModel model)");
+                serviceCode.AppendLine($"        public bool Update(int id, {entity.Entity}Model model)");
                 serviceCode.AppendLine("        {");
-                serviceCode.AppendLine("            // Add logic to update an existing record");
+                serviceCode.AppendLine("            // Validate the model and ensure the ID matches the model's ID");
+                serviceCode.AppendLine("            if (model == null || model.Id != id)");
+                serviceCode.AppendLine("            {");
+                serviceCode.AppendLine("                throw new ArgumentException(\"Invalid model or ID mismatch.\");");
+                serviceCode.AppendLine("            }");
+                serviceCode.AppendLine();
+                serviceCode.AppendLine("            // Update the record in the repository");
+                serviceCode.AppendLine($"            return _{entity.Entity.ToLower()}Repository.Update(id, model);");
                 serviceCode.AppendLine("        }");
+                serviceCode.AppendLine();
             }
 
             if (entity.Delete)
             {
-                serviceCode.AppendLine($"        public void Delete(int id)");
+                serviceCode.AppendLine($"        public bool Delete(int id)");
                 serviceCode.AppendLine("        {");
-                serviceCode.AppendLine("            // Add logic to delete a record");
+                serviceCode.AppendLine("            // Ensure the record exists before attempting to delete");
+                serviceCode.AppendLine($"            var existingEntity = _{entity.Entity.ToLower()}Repository.GetById(id);");
+                serviceCode.AppendLine("            if (existingEntity == null)");
+                serviceCode.AppendLine("            {");
+                serviceCode.AppendLine("                return false;");
+                serviceCode.AppendLine("            }");
+                serviceCode.AppendLine();
+                serviceCode.AppendLine("            // Delete the record from the repository");
+                serviceCode.AppendLine($"            return _{entity.Entity.ToLower()}Repository.Delete(id);");
                 serviceCode.AppendLine("        }");
+                serviceCode.AppendLine();
             }
 
             serviceCode.AppendLine("    }");
@@ -64,5 +104,6 @@ namespace TechnixDemo.Templates
 
             return serviceCode.ToString();
         }
+
     }
 }
