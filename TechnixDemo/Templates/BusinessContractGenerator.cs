@@ -13,32 +13,32 @@ namespace TechnixDemo.Templates
         {
             var contractCode = new StringBuilder();
 
-            contractCode.AppendLine($"using {ProjectName}.Models;");
+            contractCode.AppendLine($"using Msc.{ProjectName}.Service.CommonModel;");
             contractCode.AppendLine("using System.Collections.Generic;");
             contractCode.AppendLine();
-            contractCode.AppendLine($"namespace {ProjectName}.Business.Contracts");
+            contractCode.AppendLine($"namespace Msc.{ProjectName}.Service.Business.Contracts");
             contractCode.AppendLine("{");
             contractCode.AppendLine($"    public interface I{entity.Entity}Service");
             contractCode.AppendLine("    {");
 
             if (entity.GetAll)
             {
-                contractCode.AppendLine($"        IEnumerable<{entity.Entity}Model> GetAll();");
+                contractCode.AppendLine($"        IEnumerable<{entity.Entity}> GetAll();");
             }
 
             if (entity.GetById)
             {
-                contractCode.AppendLine($"        {entity.Entity}Model GetById(int id);");
+                contractCode.AppendLine($"        {entity.Entity} GetById(int id);");
             }
 
             if (entity.Save)
             {
-                contractCode.AppendLine($"        {entity.Entity}Model Save({entity.Entity}Model model);");
+                contractCode.AppendLine($"        {entity.Entity} Save({entity.Entity} model);");
             }
 
             if (entity.Update)
             {
-                contractCode.AppendLine($"        bool Update(int id, {entity.Entity}Model model);");
+                contractCode.AppendLine($"        bool Update({entity.Entity} model);");
             }
 
             if (entity.Delete)

@@ -123,7 +123,7 @@ namespace TechnixDemo.Service
                 UpdateProgress(90);
 
                 // Add References Between Projects
-                await AddReferencesBetweenProjects(solutionDirectory, projectName, classLibraryNames);
+                //await AddReferencesBetweenProjects(solutionDirectory, projectName, classLibraryNames);
                 //await AddTestProjectReferences(solutionDirectory, projectName, testProjectNames, classLibraryNames);
 
                 // Open Solution
