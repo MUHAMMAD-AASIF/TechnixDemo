@@ -83,50 +83,5 @@ namespace TechnixDemo.Service
                 throw new ArgumentException($"Invalid type: {type}");
             }
         }
-
-        private string ProcessTemplate(string templateContent, object templateParams)
-        {
-            // Create a DataTable to hold template parameters
-            var dataTable = new DataTable();
-            dataTable.Columns.Add("Placeholder", typeof(string));
-            dataTable.Columns.Add("Value", typeof(string));
-
-            // Fill the DataTable with parameter names and their values
-            foreach (var prop in templateParams.GetType().GetProperties())
-            {
-                string placeholder = $"<#= {prop.Name} #>";
-                string value = prop.GetValue(templateParams)?.ToString() ?? string.Empty;
-                dataTable.Rows.Add(placeholder, value);
-            }
-
-            // Replace placeholders in the template content
-            foreach (DataRow row in dataTable.Rows)
-            {
-                string placeholder = row["Placeholder"].ToString();
-                string value = row["Value"].ToString();
-                templateContent = templateContent.Replace(placeholder, value);
-            }
-
-            return templateContent;
-        }
-
-
-
-        private string GetPropertyType(string clrType)
-        {
-            switch (clrType)
-            {
-                case "String": return "string";
-                case "Int32": return "int";
-                case "Int64": return "long";
-                case "Double": return "double";
-                case "Decimal": return "decimal";
-                case "Boolean": return "bool";
-                case "Nullable`1": return "bool";
-                case "DateTime": return "DateTime";
-                // Add more cases as needed
-                default: return clrType;
-            }
-        }
     }
 }

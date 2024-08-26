@@ -68,12 +68,13 @@ namespace TechnixDemo.Forms
                 switch (e.ColumnIndex)
                 {
                     case 0: // Select
-                        updatedModel.Select = !updatedModel.Select;
-                        updatedModel.GetAll = !updatedModel.GetAll;
-                        updatedModel.GetById = !updatedModel.GetById;
-                        updatedModel.Save = !updatedModel.Save;
-                        updatedModel.Update = !updatedModel.Update;
-                        updatedModel.Delete = !updatedModel.Delete;
+                        bool newSelectValue = !updatedModel.Select;
+                        updatedModel.Select = newSelectValue;
+                        updatedModel.GetAll = newSelectValue;
+                        updatedModel.GetById = newSelectValue;
+                        updatedModel.Save = newSelectValue;
+                        updatedModel.Update = newSelectValue;
+                        updatedModel.Delete = newSelectValue;
                         break;
                     case 2: // GetAll
                         updatedModel.GetAll = !updatedModel.GetAll;
@@ -92,6 +93,9 @@ namespace TechnixDemo.Forms
                         break;
                 }
 
+                // Ensure Select is checked if any of the other options are checked
+                updatedModel.Select = updatedModel.GetAll || updatedModel.GetById || updatedModel.Save || updatedModel.Update || updatedModel.Delete;
+
                 // Refresh the DataGridView to reflect changes
                 EntityGrid.Refresh();
             }
@@ -104,7 +108,7 @@ namespace TechnixDemo.Forms
 
         private void Generate_Click(object sender, EventArgs e)
         {
-            var selectedModels = _bindingList.Where(x=>x.Select).ToList();
+            var selectedModels = _bindingList.Where(x=>x.Select && (x.GetAll || x.GetById || x.Save || x.Update || x.Delete)).ToList();
             var Filepath = _filepathRes;
             FileGenerateService fileGenerateService = new FileGenerateService(selectedModels, Filepath);
             fileGenerateService.GenerateFile();
