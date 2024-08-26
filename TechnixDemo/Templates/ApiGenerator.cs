@@ -19,10 +19,10 @@ namespace TechnixDemo.Templates
             var controllerCode = new StringBuilder();
 
             controllerCode.AppendLine("using Microsoft.AspNetCore.Mvc;");
-            controllerCode.AppendLine($"using {projectName}.Services;");
-            controllerCode.AppendLine($"using {projectName}.Models;");
+            controllerCode.AppendLine($"using Msc.{projectName}.Service.Business.Contracts;");
+            controllerCode.AppendLine($"using Msc.{projectName}.Service.CommonModel;");
             controllerCode.AppendLine();
-            controllerCode.AppendLine($"namespace {projectName}.Controllers");
+            controllerCode.AppendLine($"namespace Msc.{projectName}.Service.Controllers");
             controllerCode.AppendLine("{");
             controllerCode.AppendLine($"    [ApiController]");
             controllerCode.AppendLine($"    [Route(\"api/[controller]\")]");
@@ -65,7 +65,7 @@ namespace TechnixDemo.Templates
             if (entity.Save)
             {
                 controllerCode.AppendLine("        [HttpPost]");
-                controllerCode.AppendLine($"        public IActionResult Save{entity.Entity}([FromBody] {entity.Entity}Model model)");
+                controllerCode.AppendLine($"        public IActionResult Save{entity.Entity}([FromBody] {entity.Entity} model)");
                 controllerCode.AppendLine("        {");
                 controllerCode.AppendLine($"            if (model == null)");
                 controllerCode.AppendLine("            {");
@@ -73,27 +73,27 @@ namespace TechnixDemo.Templates
                 controllerCode.AppendLine("            }");
                 controllerCode.AppendLine();
                 controllerCode.AppendLine($"            var createdEntity = _{entity.Entity.ToLower()}Service.Save(model);");
-                controllerCode.AppendLine("            return CreatedAtAction(nameof(GetById), new { id = createdEntity.Id }, createdEntity);");
+                controllerCode.AppendLine("            return StatusCode(200);");
                 controllerCode.AppendLine("        }");
                 controllerCode.AppendLine();
             }
 
             if (entity.Update)
             {
-                controllerCode.AppendLine("        [HttpPut(\"{id}\")]");
-                controllerCode.AppendLine($"        public IActionResult Update{entity.Entity}(int id, [FromBody] {entity.Entity}Model model)");
+                controllerCode.AppendLine("        [HttpPut(\"\")]");
+                controllerCode.AppendLine($"        public IActionResult Update{entity.Entity}([FromBody] {entity.Entity} model)");
                 controllerCode.AppendLine("        {");
-                controllerCode.AppendLine("            if (model == null || id != model.Id)");
+                controllerCode.AppendLine("            if (model == null)");
                 controllerCode.AppendLine("            {");
                 controllerCode.AppendLine("                return BadRequest();");
                 controllerCode.AppendLine("            }");
                 controllerCode.AppendLine();
-                controllerCode.AppendLine($"            var updated = _{entity.Entity.ToLower()}Service.Update(id, model);");
+                controllerCode.AppendLine($"            var updated = _{entity.Entity.ToLower()}Service.Update(model);");
                 controllerCode.AppendLine("            if (!updated)");
                 controllerCode.AppendLine("            {");
                 controllerCode.AppendLine("                return NotFound();");
                 controllerCode.AppendLine("            }");
-                controllerCode.AppendLine("            return NoContent();");
+                controllerCode.AppendLine("           return StatusCode(200);");
                 controllerCode.AppendLine("        }");
                 controllerCode.AppendLine();
             }
@@ -108,7 +108,7 @@ namespace TechnixDemo.Templates
                 controllerCode.AppendLine("            {");
                 controllerCode.AppendLine("                return NotFound();");
                 controllerCode.AppendLine("            }");
-                controllerCode.AppendLine("            return NoContent();");
+                controllerCode.AppendLine("            return StatusCode(200);");
                 controllerCode.AppendLine("        }");
                 controllerCode.AppendLine();
             }

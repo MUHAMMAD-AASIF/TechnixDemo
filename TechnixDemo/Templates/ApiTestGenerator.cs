@@ -9,25 +9,25 @@ namespace TechnixDemo.Templates
 {
     internal class ApiTestGenerator
     {
-        public string GenerateBusinessTests(EntitySelectModel entity, string ProjectName)
+        public string GenerateApiTest(EntitySelectModel entity, string ProjectName)
         {
             var testCode = new StringBuilder();
 
             // Add necessary using statements
             testCode.AppendLine("using Xunit;");
             testCode.AppendLine("using Moq;");
-            testCode.AppendLine($"using {ProjectName}.Business;");
-            testCode.AppendLine($"using {ProjectName}.DataAccess.Contracts;");
-            testCode.AppendLine($"using {ProjectName}.Models;");
+            testCode.AppendLine($"using Msc.{ProjectName}.Service.CommonModel;");
+            testCode.AppendLine($"using Msc.{ProjectName}.Service.Business;");
+            testCode.AppendLine($"using Msc.{ProjectName}.Service.DataAccess.Contracts;");
             testCode.AppendLine();
             testCode.AppendLine($"public class {entity.Entity}ServiceTests");
             testCode.AppendLine("{");
-            testCode.AppendLine($"    private readonly Mock<I{entity.Entity}DataAccess> _mockDataAccess;");
+            testCode.AppendLine($"    private readonly Mock<I{entity.Entity}Repository> _mockDataAccess;");
             testCode.AppendLine($"    private readonly {entity.Entity}Service _service;");
             testCode.AppendLine();
             testCode.AppendLine($"    public {entity.Entity}ServiceTests()");
             testCode.AppendLine("    {");
-            testCode.AppendLine($"        _mockDataAccess = new Mock<I{entity.Entity}DataAccess>();");
+            testCode.AppendLine($"        _mockDataAccess = new Mock<I{entity.Entity}Repository>();");
             testCode.AppendLine($"        _service = new {entity.Entity}Service(_mockDataAccess.Object);");
             testCode.AppendLine("    }");
             testCode.AppendLine();
@@ -39,13 +39,13 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"    public void GetAll{entity.Entity}_ReturnsListOfEntities()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
-                testCode.AppendLine($"        _mockDataAccess.Setup(da => da.GetAll()).Returns(new List<{entity.Entity}Model>());");
+                testCode.AppendLine($"        _mockDataAccess.Setup(da => da.GetAll()).Returns(new List<{entity.Entity}>());");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Act");
                 testCode.AppendLine($"        var result = _service.GetAll();");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
-                testCode.AppendLine($"        Assert.IsType<List<{entity.Entity}Model>>(result);");
+                testCode.AppendLine($"        Assert.IsType<List<{entity.Entity}>>(result);");
                 testCode.AppendLine("    }");
                 testCode.AppendLine();
             }
@@ -57,14 +57,14 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"    public void Get{entity.Entity}ById_ReturnsEntity_WhenValidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
-                testCode.AppendLine($"        var entity = new {entity.Entity}Model();");
+                testCode.AppendLine($"        var entity = new {entity.Entity}();");
                 testCode.AppendLine($"        _mockDataAccess.Setup(da => da.GetById(It.IsAny<int>())).Returns(entity);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Act");
                 testCode.AppendLine($"        var result = _service.GetById(1);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
-                testCode.AppendLine($"        Assert.IsType<{entity.Entity}Model>(result);");
+                testCode.AppendLine($"        Assert.IsType<{entity.Entity}>(result);");
                 testCode.AppendLine("    }");
                 testCode.AppendLine();
 
@@ -90,13 +90,13 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"    public void Save{entity.Entity}_CallsDataAccessSave()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
-                testCode.AppendLine($"        var entity = new {entity.Entity}Model();");
+                testCode.AppendLine($"        var entity = new {entity.Entity}();");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Act");
                 testCode.AppendLine($"        _service.Save(entity);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
-                testCode.AppendLine($"        _mockDataAccess.Verify(da => da.Save(It.IsAny<{entity.Entity}Model>()), Times.Once);");
+                testCode.AppendLine($"        _mockDataAccess.Verify(da => da.Save(It.IsAny<{entity.Entity}>()), Times.Once);");
                 testCode.AppendLine("    }");
                 testCode.AppendLine();
             }
@@ -108,8 +108,8 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"    public void Update{entity.Entity}_ReturnsTrue_WhenValidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
-                testCode.AppendLine($"        var entity = new {entity.Entity}Model();");
-                testCode.AppendLine($"        _mockDataAccess.Setup(da => da.Update(It.IsAny<int>(), entity)).Returns(true);");
+                testCode.AppendLine($"        var entity = new {entity.Entity}();");
+                testCode.AppendLine($"        _mockDataAccess.Setup(da => da.Update(entity)).Returns(true);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Act");
                 testCode.AppendLine($"        var result = _service.Update(1, entity);");
@@ -123,8 +123,8 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"    public void Update{entity.Entity}_ReturnsFalse_WhenInvalidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
-                testCode.AppendLine($"        var entity = new {entity.Entity}Model();");
-                testCode.AppendLine($"        _mockDataAccess.Setup(da => da.Update(It.IsAny<int>(), entity)).Returns(false);");
+                testCode.AppendLine($"        var entity = new {entity.Entity}();");
+                testCode.AppendLine($"        _mockDataAccess.Setup(da => da.Update(entity)).Returns(false);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Act");
                 testCode.AppendLine($"        var result = _service.Update(1, entity);");

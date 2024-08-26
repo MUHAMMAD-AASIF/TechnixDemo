@@ -52,13 +52,13 @@ namespace TechnixDemo.Service
             return tableNames;
         }
 
-        public Dictionary<string, string> GetColumnNamesAndDataTypes(string connectionString, string tableName)
+        public Dictionary<string, string> GetColumnNamesAndDataTypes(string tableName)
         {
             var columnData = new Dictionary<string, string>();
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
 
@@ -89,6 +89,52 @@ namespace TechnixDemo.Service
             }
 
             return columnData;
+        }
+
+        public List<string> GetForeignTables(string tableName)
+        {
+            var foreignTables = new List<string>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+
+                    // Query to find foreign tables that reference the given table
+                    string query = @"
+                    SELECT DISTINCT
+                        FK.TABLE_NAME AS ForeignTable
+                    FROM
+                        INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                        INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE FK
+                            ON RC.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
+                        INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE PK
+                            ON RC.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME
+                    WHERE
+                        PK.TABLE_NAME = @TableName";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@TableName", tableName);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                string foreignTableName = reader["ForeignTable"].ToString();
+                                foreignTables.Add(foreignTableName);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+
+            return foreignTables;
         }
 
     }
