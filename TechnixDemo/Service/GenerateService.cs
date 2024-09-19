@@ -123,7 +123,7 @@ namespace TechnixDemo.Service
                 UpdateProgress(90);
 
                 // Add References Between Projects
-                //await AddReferencesBetweenProjects(solutionDirectory, projectName, classLibraryNames);
+                await AddReferencesBetweenProjects(solutionDirectory, projectName);
                 //await AddTestProjectReferences(solutionDirectory, projectName, testProjectNames, classLibraryNames);
 
                 // Open Solution
@@ -145,55 +145,34 @@ namespace TechnixDemo.Service
 
         #region Adding Reference between all Projects 
 
-        private async Task AddReferencesBetweenProjects(string solutionDirectory, string projectName, string[] classLibraryProjects)
+        private async Task AddReferencesBetweenProjects(string solutionDirectory, string projectName)
         {
-            // Iterate through each class library project
-            foreach (var lib in classLibraryProjects)
+            // Define references based on the project
+            var projectReferences = new Dictionary<string, List<string>>()
             {
-                var libProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{lib}", $"Msc.{projectName}.Service.{lib}.csproj");
+                { "Api", new List<string> { "Business", "Business.Contracts", "CommonModel", "DataAccess", "DataAccess.Contracts" } },
+                { "Api.Test", new List<string> { "Api", "CommonModel" } },
+                { "Business", new List<string> { "Business.Contracts", "CommonModel", "DataAccess", "DataAccess.Contracts" } },
+                { "Business.Contracts", new List<string> { "CommonModel", "DataAccess.Contracts" } },
+                { "Business.Test", new List<string> { "Business", "Business.Contracts", "CommonModel", "DataAccess", "DataAccess.Contracts" } },
+                { "DataAccess", new List<string> { "Business.Contracts", "CommonModel", "DataAccess.Contracts" } },
+                { "DataAccess.Contracts", new List<string> { "CommonModel" } }
+            };
 
-                // Add references between class libraries
-                foreach (var refLib in classLibraryProjects)
+            foreach (var project in projectReferences)
+            {
+                var projectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{project.Key}", $"Msc.{projectName}.Service.{project.Key}.csproj");
+
+                foreach (var reference in project.Value)
                 {
-                    if (lib != refLib)
-                    {
-                        var refProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{refLib}", $"Msc.{projectName}.Service.{refLib}.csproj");
+                    var referencePath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{reference}", $"Msc.{projectName}.Service.{reference}.csproj");
 
-                        // Add reference if it doesn't already exist
-                        await ExecuteDotnetCommandAsync($"add {libProjectPath} reference {refProjectPath}", solutionDirectory);
-                    }
+                    // Add reference if it doesn't already exist
+                    await ExecuteDotnetCommandAsync($"add {projectPath} reference {referencePath}", solutionDirectory);
                 }
-            }
-
-            // Add references from class libraries to the Web API project
-            var apiProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api", $"Msc.{projectName}.Service.Api.csproj");
-
-            foreach (var lib in classLibraryProjects)
-            {
-                var libProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{lib}", $"Msc.{projectName}.Service.{lib}.csproj");
-
-                // Add reference from Web API project to each class library project
-                await ExecuteDotnetCommandAsync($"add {apiProjectPath} reference {libProjectPath}", solutionDirectory);
             }
         }
 
-
-        private async Task AddTestProjectReferences(string solutionDirectory, string projectName, string[] testProjects, string[] classLibraryProjects)
-        {
-            foreach (var test in testProjects)
-            {
-                var testProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{test}.Test", $"Msc.{projectName}.Service.{test}.Test.csproj");
-                string targetProjectName = test;
-                var targetProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{targetProjectName}", $"Msc.{projectName}.Service.{targetProjectName}.csproj");
-
-                if (targetProjectName == "Api")
-                {
-                    targetProjectPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api", $"Msc.{projectName}.Service.Api.csproj");
-                }
-
-                await ExecuteDotnetCommandAsync($"add {testProjectPath} reference {targetProjectPath}", solutionDirectory);
-            }
-        }
         #endregion
 
         private void UpdateDataGridView(string step, string status)
@@ -296,7 +275,7 @@ namespace TechnixDemo.Service
         //        //if (csprojPath != null)
         //        //{
         //        //    var csprojContent = File.ReadAllText(csprojPath);
-                    
+
         //        //    var newFolder = $"<Folder Include=\"{folderName}\\\" />\n";
         //        //    var foldergroup = "<ItemGroup>";
         //        //    if (!csprojContent.Contains(newFolder))

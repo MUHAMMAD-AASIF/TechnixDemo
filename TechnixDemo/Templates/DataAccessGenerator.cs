@@ -16,8 +16,9 @@ namespace TechnixDemo.Templates
 
             dataAccessCode.AppendLine($"using Msc.{ProjectName}.Service.CommonModel;");
             dataAccessCode.AppendLine($"using Msc.{ProjectName}.Service.DataAccess.Contracts;");
-            dataAccessCode.AppendLine($"using Msc.{ProjectName}.Service.DataAccess.Models;");
-            dataAccessCode.AppendLine("using System.Collections.Generic;");
+            dataAccessCode.AppendLine($"using Msc.{ProjectName}.Service.DataAccess.Contracts.Context;");
+            dataAccessCode.AppendLine($"using Msc.{ProjectName}.Service.DataAccess.Contracts;");
+            dataAccessCode.AppendLine("using Microsoft.EntityFrameworkCore;");
             dataAccessCode.AppendLine("using System.Linq;");
             dataAccessCode.AppendLine();
             dataAccessCode.AppendLine($"namespace Msc.{ProjectName}.Service.DataAccess");
@@ -38,8 +39,9 @@ namespace TechnixDemo.Templates
                 dataAccessCode.AppendLine("        {");
                 dataAccessCode.AppendLine($"            // Logic for getting all {entity.Entity} entities");
                 var forgintb = db.GetForeignTables(entity.Entity);
+                string result = string.Join(", ", forgintb.Select(item => $".Include(\"{item}\")")).Replace(", ", "");
 
-                dataAccessCode.AppendLine($"            return _context.{entity.Entity}s.ToList();");
+                dataAccessCode.AppendLine($"            return _context.{entity.Entity}s{result}.ToList();");
                 dataAccessCode.AppendLine("        }");
                 dataAccessCode.AppendLine();
             }
@@ -74,7 +76,7 @@ namespace TechnixDemo.Templates
                 dataAccessCode.AppendLine($"            var existingEntity = _context.{entity.Entity}s.FirstOrDefault(e => e.Id == model.Id);");
                 dataAccessCode.AppendLine("            if (existingEntity == null) return false;");
                 dataAccessCode.AppendLine();
-                
+
                 var entityNames = db.GetColumnNamesAndDataTypes(entity.Entity);
 
                 foreach (var column in entityNames)

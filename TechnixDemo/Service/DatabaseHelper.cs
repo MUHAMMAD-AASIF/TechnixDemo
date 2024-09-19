@@ -103,16 +103,21 @@ namespace TechnixDemo.Service
 
                     // Query to find foreign tables that reference the given table
                     string query = @"
-                    SELECT DISTINCT
-                        FK.TABLE_NAME AS ForeignTable
-                    FROM
-                        INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
-                        INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE FK
-                            ON RC.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
-                        INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE PK
-                            ON RC.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME
-                    WHERE
-                        PK.TABLE_NAME = @TableName";
+                    SELECT 
+                        tr.name AS ReferencedTable
+                    FROM 
+                        sys.foreign_keys AS fk
+                    INNER JOIN 
+                        sys.foreign_key_columns AS fkc ON fk.object_id = fkc.constraint_object_id
+                    INNER JOIN 
+                        sys.tables AS tp ON fkc.parent_object_id = tp.object_id
+                    INNER JOIN 
+                        sys.columns AS cp ON fkc.parent_object_id = cp.object_id AND fkc.parent_column_id = cp.column_id
+                    INNER JOIN 
+                        sys.tables AS tr ON fkc.referenced_object_id = tr.object_id
+                    INNER JOIN 
+                        sys.columns AS cr ON fkc.referenced_object_id = cr.object_id AND fkc.referenced_column_id = cr.column_id
+	                    Where tp.name = @TableName";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
@@ -122,7 +127,7 @@ namespace TechnixDemo.Service
                         {
                             while (reader.Read())
                             {
-                                string foreignTableName = reader["ForeignTable"].ToString();
+                                string foreignTableName = reader["ReferencedTable"].ToString();
                                 foreignTables.Add(foreignTableName);
                             }
                         }
