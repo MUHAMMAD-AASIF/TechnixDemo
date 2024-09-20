@@ -112,7 +112,7 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"        _mockDataAccess.Setup(da => da.Update(entity)).Returns(true);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Act");
-                testCode.AppendLine($"        var result = _service.Update(1, entity);");
+                testCode.AppendLine($"        var result = _service.Update(entity);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
                 testCode.AppendLine($"        Assert.True(result);");
@@ -127,7 +127,7 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"        _mockDataAccess.Setup(da => da.Update(entity)).Returns(false);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Act");
-                testCode.AppendLine($"        var result = _service.Update(1, entity);");
+                testCode.AppendLine($"        var result = _service.Update(entity);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
                 testCode.AppendLine($"        Assert.False(result);");
