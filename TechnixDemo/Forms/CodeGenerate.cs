@@ -194,7 +194,7 @@ namespace TechnixDemo
         private void GetPathBtn_Click(object sender, EventArgs e)
         {
             // Combine paths and check if they exist before assigning them to text boxes.
-            var projectname = SolutionPath.Text.Substring(SolutionPath.Text.LastIndexOf("\\"), SolutionPath.Text.Length - SolutionPath.Text.LastIndexOf("\\")).Replace("\\","");
+            string projectname = Path.GetFileName(Directory.GetFiles(SolutionPath.Text, "*.sln").FirstOrDefault().Replace("Msc.", "").Replace(".Service.sln", ""));
             var apiPath = Path.Combine(SolutionPath.Text, $"Msc.{projectname}.Service.Api");
             
             projectResponseModel.ProjectName =string.IsNullOrEmpty(SolNmTxt.Text)? projectname:SolNmTxt.Text;
