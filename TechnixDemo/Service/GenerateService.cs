@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿
 using System.Diagnostics;
-using System.IO.Compression;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using TechnixDemo.Model;
-using System.Data;
-using System.Data.SqlClient;
 
 namespace TechnixDemo.Service
 {

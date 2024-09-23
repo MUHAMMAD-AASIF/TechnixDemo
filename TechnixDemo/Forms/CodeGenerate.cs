@@ -1,9 +1,5 @@
 using TechnixDemo.Service;
 using TechnixDemo.Model;
-using System.Security.Cryptography.X509Certificates;
-using System.Diagnostics;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using TechnixDemo.Forms;
 
 namespace TechnixDemo

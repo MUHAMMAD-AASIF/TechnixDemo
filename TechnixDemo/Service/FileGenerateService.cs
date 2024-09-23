@@ -108,11 +108,6 @@ namespace TechnixDemo.Service
                         if (fileContent != updatedContent)
                         {
                             File.WriteAllText(filePath, updatedContent);
-                            Console.WriteLine($"File '{filePath}' updated successfully.");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"No changes made in file '{filePath}'. The content was already up to date.");
                         }
                     }
                 }
@@ -146,21 +141,11 @@ namespace TechnixDemo.Service
                     string updatedContent = Regex.Replace(fileContent, Regex.Escape(oldValue1), newValue1);
                     updatedContent = Regex.Replace(updatedContent, Regex.Escape(oldValue2), newValue2);
 
-
                     // Write the updated content back to the file only if changes were made
                     if (fileContent != updatedContent)
                     {
                         File.WriteAllText(filePath, updatedContent);
-                        Console.WriteLine("File updated successfully.");
                     }
-                    else
-                    {
-                        Console.WriteLine("No changes made. The content was already up to date.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("File does not exist.");
                 }
             }
             catch (Exception ex)
