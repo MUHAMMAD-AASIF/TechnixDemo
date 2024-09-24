@@ -39,7 +39,7 @@ namespace TechnixDemo.Service
                 responseModel.SolutionPath = solutionDirectory;
                 await ExecuteDotnetCommandAsync($"new sln --name Msc.{solutionName}.Service", solutionDirectory);
                 UpdateDataGridView("Create Solution", "Completed");
-                UpdateProgress(5);
+                UpdateProgress(10);
 
                 // Create Web API Project
                 UpdateDataGridView("Create Web API Project", "Started");
@@ -47,14 +47,7 @@ namespace TechnixDemo.Service
                 responseModel.ProjectPath = webApiProjectDirectory;
                 await ExecuteDotnetCommandAsync($"new webapi --name Msc.{projectName}.Service.Api", solutionDirectory);
                 UpdateDataGridView("Create Web API Project", "Completed");
-                UpdateProgress(15);
-
-                // Create Blazor Server Project
-                UpdateDataGridView("Create Blazor Server Project", "Started");
-                var blazorServerProjectDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Client");
-                await ExecuteDotnetCommandAsync($"new blazorserver --name Msc.{projectName}.Client", solutionDirectory);
-                UpdateDataGridView("Create Blazor Server Project", "Completed");
-                UpdateProgress(25);
+                UpdateProgress(20);
 
                 // Create Class Library Projects
                 var classLibraryNames = new[] { "Business", "Business.Contracts", "CommonModel", "DataAccess", "DataAccess.Contracts" };
@@ -64,7 +57,7 @@ namespace TechnixDemo.Service
                     var classLibraryDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{libraryName}");
                     await ExecuteDotnetCommandAsync($"new classlib --name Msc.{projectName}.Service.{libraryName}", solutionDirectory);
                     UpdateDataGridView($"Create {libraryName} Class Library", "Completed");
-                    UpdateProgress(25 + Array.IndexOf(classLibraryNames, libraryName) * 10);
+                    UpdateProgress(20 + Array.IndexOf(classLibraryNames, libraryName) * 5);
                 }
 
                 // Create NUnit Test Projects
@@ -75,15 +68,14 @@ namespace TechnixDemo.Service
                     var testProjectDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{testName}.Test");
                     await ExecuteDotnetCommandAsync($"new nunit --name Msc.{projectName}.Service.{testName}.Test", solutionDirectory);
                     UpdateDataGridView($"Create NUnit {testName} Test Project", "Completed");
+                    UpdateProgress(40 + Array.IndexOf(testProjectNames, testName) * 5);
                 }
-                UpdateProgress(55);
 
                 // Add projects to solution
                 UpdateDataGridView("Add Projects to Solution", "Started");
                 var projectPaths = new List<string>
                 {
                     Path.Combine(webApiProjectDirectory, $"Msc.{projectName}.Service.Api.csproj"),
-                    Path.Combine(blazorServerProjectDirectory, $"Msc.{projectName}.Client.csproj"),
                     Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business", $"Msc.{projectName}.Service.Business.csproj"),
                     Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Contracts", $"Msc.{projectName}.Service.Business.Contracts.csproj"),
                     Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.CommonModel", $"Msc.{projectName}.Service.CommonModel.csproj"),
@@ -98,11 +90,10 @@ namespace TechnixDemo.Service
                     await ExecuteDotnetCommandAsync($"sln {Path.Combine(solutionDirectory, $"Msc.{solutionName}.Service.sln")} add {projectPath}", solutionDirectory);
                 }
                 UpdateDataGridView("Add Projects to Solution", "Completed");
-                UpdateProgress(80);
+                UpdateProgress(60);
 
                 // Create Project Folders (for Web API Project)
                 UpdateDataGridView("Create Project Folders", "Started");
-                //CreateProjectFolders(solutionDirectory, projectName);
                 responseModel.APIPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api");
                 responseModel.BusinessPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business");
                 responseModel.BusinessContractPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Contracts");
@@ -112,11 +103,11 @@ namespace TechnixDemo.Service
                 responseModel.APITestPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.API.Test");
                 responseModel.BusinessTestPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Test");
                 UpdateDataGridView("Create Project Folders", "Completed");
-                UpdateProgress(90);
+                UpdateProgress(70);
 
                 // Add References Between Projects
                 await AddReferencesBetweenProjects(solutionDirectory, projectName);
-                //await AddTestProjectReferences(solutionDirectory, projectName, testProjectNames, classLibraryNames);
+                UpdateProgress(80);
 
                 // Open Solution
                 UpdateDataGridView("Open Solution", "Started");
@@ -158,8 +149,6 @@ namespace TechnixDemo.Service
                 foreach (var reference in project.Value)
                 {
                     var referencePath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{reference}", $"Msc.{projectName}.Service.{reference}.csproj");
-
-                    // Add reference if it doesn't already exist
                     await ExecuteDotnetCommandAsync($"add {projectPath} reference {referencePath}", solutionDirectory);
                 }
             }
@@ -225,63 +214,6 @@ namespace TechnixDemo.Service
                 Console.WriteLine($"Solution file not found at {solutionPath}");
             }
         }
-
-        //private void CreateProjectFolders(string projectDirectory, string projectName)
-        //{
-        //    // API Project
-        //    var apiPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Api");
-        //    var APIlistFolder = new List<string>() {
-        //    "App_Start","Controllers","Extension","Helpers","Infrastructure","Mapping","Resource"
-        //    };
-        //    CreateFolderAndAddToCsproj(apiPath, APIlistFolder);
-
-        //    // API Test Project
-        //    var apiTestPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Api.Test");
-        //    CreateFolderAndAddToCsproj(apiTestPath, new List<string>() { "UnitTest" });
-
-        //    // Business Test Project
-        //    var businessTestPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Business.Test");
-        //    CreateFolderAndAddToCsproj(businessTestPath, new List<string>() { "UnitTest" });
-
-        //    // Business Contracts Project
-        //    var businessContractsPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Business.Contracts");
-        //    CreateFolderAndAddToCsproj(businessContractsPath, new List<string>() { "Interfaces" });
-
-        //    // Data Access Contracts Project
-        //    var dataAccessContractsPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.DataAccess.Contracts");
-        //    CreateFolderAndAddToCsproj(dataAccessContractsPath, new List<string>() { "Interfaces" });
-        //}
-
-        //private void CreateFolderAndAddToCsproj(string projectDirectory, List<string> forlders)
-        //{
-        //    //var itemGroup = "<ItemGroup/>\n";
-        //    foreach (var folderName in forlders)
-        //    {
-        //        var folderPath = Path.Combine(projectDirectory, folderName);
-        //        if (!Directory.Exists(folderPath))
-        //        {
-        //            Directory.CreateDirectory(folderPath);
-        //        }
-
-        //        //var csprojPath = Directory.GetFiles(projectDirectory, "*.csproj").FirstOrDefault();
-        //        //if (csprojPath != null)
-        //        //{
-        //        //    var csprojContent = File.ReadAllText(csprojPath);
-
-        //        //    var newFolder = $"<Folder Include=\"{folderName}\\\" />\n";
-        //        //    var foldergroup = "<ItemGroup>";
-        //        //    if (!csprojContent.Contains(newFolder))
-        //        //    {
-        //        //        csprojContent = csprojContent.Replace(itemGroup, itemGroup + newFolder);
-        //        //        File.WriteAllText(csprojPath, csprojContent);
-        //        //    }
-        //        //}
-        //    }
-
-
-        //}
-
-
 
         private string GetPropertyType(string clrType)
         {

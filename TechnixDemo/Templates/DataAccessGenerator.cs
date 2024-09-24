@@ -17,64 +17,65 @@ namespace TechnixDemo.Templates
             dataAccessCode.AppendLine($"using Msc.{ProjectName}.Service.CommonModel;");
             dataAccessCode.AppendLine($"using Msc.{ProjectName}.Service.DataAccess.Contracts;");
             dataAccessCode.AppendLine($"using Msc.{ProjectName}.Service.DataAccess.Contracts.Context;");
-            dataAccessCode.AppendLine($"using Msc.{ProjectName}.Service.DataAccess.Contracts;");
             dataAccessCode.AppendLine("using Microsoft.EntityFrameworkCore;");
             dataAccessCode.AppendLine("using System.Linq;");
             dataAccessCode.AppendLine();
             dataAccessCode.AppendLine($"namespace Msc.{ProjectName}.Service.DataAccess");
             dataAccessCode.AppendLine("{");
-            dataAccessCode.AppendLine($"    public class {entity.Entity}Repository : I{entity.Entity}Repository");
-            dataAccessCode.AppendLine("    {");
-            dataAccessCode.AppendLine($"        private readonly AppDbContext _context;");
+            dataAccessCode.AppendLine($"\tpublic class {entity.Entity}Repository : I{entity.Entity}Repository");
+            dataAccessCode.AppendLine("\t{");
+            dataAccessCode.AppendLine($"\t\tprivate readonly AppDbContext _context;");
             dataAccessCode.AppendLine();
-            dataAccessCode.AppendLine($"        public {entity.Entity}Repository(AppDbContext context)");
-            dataAccessCode.AppendLine("        {");
-            dataAccessCode.AppendLine("            _context = context;");
-            dataAccessCode.AppendLine("        }");
+            dataAccessCode.AppendLine($"\t\tpublic {entity.Entity}Repository(AppDbContext context)");
+            dataAccessCode.AppendLine("\t\t{");
+            dataAccessCode.AppendLine("\t\t\t_context = context;");
+            dataAccessCode.AppendLine("\t\t}");
             dataAccessCode.AppendLine();
+
             DatabaseHelper db = new DatabaseHelper();
+
             if (entity.GetAll)
             {
-                dataAccessCode.AppendLine($"        public IEnumerable<{entity.Entity}> GetAll()");
-                dataAccessCode.AppendLine("        {");
-                dataAccessCode.AppendLine($"            // Logic for getting all {entity.Entity} entities");
+                dataAccessCode.AppendLine($"\t\tpublic IEnumerable<{entity.Entity}> GetAll()");
+                dataAccessCode.AppendLine("\t\t{");
+                dataAccessCode.AppendLine($"\t\t\t// Logic for getting all {entity.Entity} entities");
                 var forgintb = db.GetForeignTables(entity.Entity);
                 string result = string.Join(", ", forgintb.Select(item => $".Include(\"{item}\")")).Replace(", ", "");
 
-                dataAccessCode.AppendLine($"            return _context.{entity.Entity}s{result}.ToList();");
-                dataAccessCode.AppendLine("        }");
+                dataAccessCode.AppendLine($"\t\t\treturn _context.{entity.Entity}s{result}.ToList();");
+                dataAccessCode.AppendLine("\t\t}");
                 dataAccessCode.AppendLine();
             }
 
             if (entity.GetById)
             {
-                dataAccessCode.AppendLine($"        public {entity.Entity} GetById(int id)");
-                dataAccessCode.AppendLine("        {");
-                dataAccessCode.AppendLine($"            // Logic for getting {entity.Entity} by Id");
-                dataAccessCode.AppendLine($"            return _context.{entity.Entity}s.FirstOrDefault(e => e.Id == id);");
-                dataAccessCode.AppendLine("        }");
+                dataAccessCode.AppendLine($"\t\tpublic {entity.Entity} GetById(int id)");
+                dataAccessCode.AppendLine("\t\t{");
+                dataAccessCode.AppendLine($"\t\t\t// Logic for getting {entity.Entity} by Id");
+                dataAccessCode.AppendLine($"\t\t\treturn _context.{entity.Entity}s.FirstOrDefault(e => e.Id == id);");
+                dataAccessCode.AppendLine("\t\t}");
                 dataAccessCode.AppendLine();
             }
 
             if (entity.Save)
             {
-                dataAccessCode.AppendLine($"        public {entity.Entity} Save({entity.Entity} model)");
-                dataAccessCode.AppendLine("        {");
-                dataAccessCode.AppendLine($"            // Logic for saving a new {entity.Entity}");
-                dataAccessCode.AppendLine("            _context.Add(model);");
-                dataAccessCode.AppendLine("            _context.SaveChanges();");
-                dataAccessCode.AppendLine("            return model;");
-                dataAccessCode.AppendLine("        }");
+                dataAccessCode.AppendLine($"\t\tpublic {entity.Entity} Save({entity.Entity} model)");
+                dataAccessCode.AppendLine("\t\t{");
+                dataAccessCode.AppendLine($"\t\t\t// Logic for saving a new {entity.Entity}");
+                dataAccessCode.AppendLine("\t\t\t_context.Add(model);");
+                dataAccessCode.AppendLine("\t\t\t_context.SaveChanges();");
+                dataAccessCode.AppendLine("\t\t\treturn model;");
+                dataAccessCode.AppendLine("\t\t}");
                 dataAccessCode.AppendLine();
             }
 
             if (entity.Update)
             {
-                dataAccessCode.AppendLine($"        public bool Update({entity.Entity} model)");
-                dataAccessCode.AppendLine("        {");
-                dataAccessCode.AppendLine($"            // Logic for updating an existing {entity.Entity}");
-                dataAccessCode.AppendLine($"            var existingEntity = _context.{entity.Entity}s.FirstOrDefault(e => e.Id == model.Id);");
-                dataAccessCode.AppendLine("            if (existingEntity == null) return false;");
+                dataAccessCode.AppendLine($"\t\tpublic bool Update({entity.Entity} model)");
+                dataAccessCode.AppendLine("\t\t{");
+                dataAccessCode.AppendLine($"\t\t\t// Logic for updating an existing {entity.Entity}");
+                dataAccessCode.AppendLine($"\t\t\tvar existingEntity = _context.{entity.Entity}s.FirstOrDefault(e => e.Id == model.Id);");
+                dataAccessCode.AppendLine("\t\t\tif (existingEntity == null) return false;");
                 dataAccessCode.AppendLine();
 
                 var entityNames = db.GetColumnNamesAndDataTypes(entity.Entity);
@@ -83,33 +84,34 @@ namespace TechnixDemo.Templates
                 {
                     if (column.Key != "Id")
                     {
-                        dataAccessCode.AppendLine($"existingEntity.{column.Key} = model.{column.Key} ; // Update necessary properties");
+                        dataAccessCode.AppendLine($"\t\t\texistingEntity.{column.Key} = model.{column.Key}; // Update necessary properties");
                     }
                 }
+
                 dataAccessCode.AppendLine();
-                dataAccessCode.AppendLine("            _context.Update(existingEntity);");
-                dataAccessCode.AppendLine("            _context.SaveChanges();");
-                dataAccessCode.AppendLine("            return true;");
-                dataAccessCode.AppendLine("        }");
+                dataAccessCode.AppendLine("\t\t\t_context.Update(existingEntity);");
+                dataAccessCode.AppendLine("\t\t\t_context.SaveChanges();");
+                dataAccessCode.AppendLine("\t\t\treturn true;");
+                dataAccessCode.AppendLine("\t\t}");
                 dataAccessCode.AppendLine();
             }
 
             if (entity.Delete)
             {
-                dataAccessCode.AppendLine($"        public bool Delete(int id)");
-                dataAccessCode.AppendLine("        {");
-                dataAccessCode.AppendLine($"            // Logic for deleting an existing {entity.Entity}");
-                dataAccessCode.AppendLine($"            var entityToDelete = _context.{entity.Entity}s.FirstOrDefault(e => e.Id == id);");
-                dataAccessCode.AppendLine("            if (entityToDelete == null) return false;");
+                dataAccessCode.AppendLine($"\t\tpublic bool Delete(int id)");
+                dataAccessCode.AppendLine("\t\t{");
+                dataAccessCode.AppendLine($"\t\t\t// Logic for deleting an existing {entity.Entity}");
+                dataAccessCode.AppendLine($"\t\t\tvar entityToDelete = _context.{entity.Entity}s.FirstOrDefault(e => e.Id == id);");
+                dataAccessCode.AppendLine("\t\t\tif (entityToDelete == null) return false;");
                 dataAccessCode.AppendLine();
-                dataAccessCode.AppendLine("            _context.Remove(entityToDelete);");
-                dataAccessCode.AppendLine("            _context.SaveChanges();");
-                dataAccessCode.AppendLine("            return true;");
-                dataAccessCode.AppendLine("        }");
+                dataAccessCode.AppendLine("\t\t\t_context.Remove(entityToDelete);");
+                dataAccessCode.AppendLine("\t\t\t_context.SaveChanges();");
+                dataAccessCode.AppendLine("\t\t\treturn true;");
+                dataAccessCode.AppendLine("\t\t}");
                 dataAccessCode.AppendLine();
             }
 
-            dataAccessCode.AppendLine("    }");
+            dataAccessCode.AppendLine("\t}");
             dataAccessCode.AppendLine("}");
 
             return dataAccessCode.ToString();

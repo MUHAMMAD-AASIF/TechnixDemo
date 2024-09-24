@@ -111,7 +111,7 @@ namespace TechnixDemo.Forms
             var selectedModels = _bindingList.Where(x=>x.Select && (x.GetAll || x.GetById || x.Save || x.Update || x.Delete)).ToList();
             var Filepath = _filepathRes;
             FileGenerateService fileGenerateService = new FileGenerateService(selectedModels, Filepath);
-            fileGenerateService.GenerateFile();
+            fileGenerateService.ProcessFileGeneration();
             MessageBox.Show("Files Created Sucessfully");
         }
     }

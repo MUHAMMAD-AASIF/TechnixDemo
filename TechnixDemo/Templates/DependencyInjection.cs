@@ -10,7 +10,7 @@ namespace TechnixDemo.Templates
     public class DependencyInjection
     {
         public string GenerateDependencyInjection(string projectName)
-        {// Assuming project name is BMS; replace it with the actual project name if needed.
+        {
             var DpCode = new StringBuilder();
 
             DpCode.AppendLine("using Microsoft.IdentityModel.Tokens;");
@@ -22,24 +22,26 @@ namespace TechnixDemo.Templates
             DpCode.AppendLine();
             DpCode.AppendLine($"namespace Msc.{projectName}.Service.Api.App_Start");
             DpCode.AppendLine("{");
-            DpCode.AppendLine("    public static class ContainerExtension");
-            DpCode.AppendLine("    {");
-            DpCode.AppendLine("        public static void LoadCustomConfiguration(IServiceCollection Services)");
-            DpCode.AppendLine("        {");
-            DpCode.AppendLine("            if (Services == null)");
-            DpCode.AppendLine("            {");
-            DpCode.AppendLine("                throw new ArgumentNullException(nameof(Services));");
-            DpCode.AppendLine("            }");
-            DpCode.AppendLine("            // Business Dependency injection for Service start");
-            DpCode.AppendLine("            // Business Dependency injection for Service end");
+            DpCode.AppendLine("\tpublic static class ContainerExtension");
+            DpCode.AppendLine("\t{");
+            DpCode.AppendLine("\t\tpublic static void LoadCustomConfiguration(IServiceCollection Services)");
+            DpCode.AppendLine("\t\t{");
+            DpCode.AppendLine("\t\t\tif (Services == null)");
+            DpCode.AppendLine("\t\t\t{");
+            DpCode.AppendLine("\t\t\t\tthrow new ArgumentNullException(nameof(Services));");
+            DpCode.AppendLine("\t\t\t}");
             DpCode.AppendLine();
-            DpCode.AppendLine("            // DataAccess Dependency injection for Repository start");
-            DpCode.AppendLine("            // DataAccess Dependency injection for Repository end");
-            DpCode.AppendLine("        }");
-            DpCode.AppendLine("    }");
+            DpCode.AppendLine("\t\t\t// Business Dependency injection for Service start");
+            DpCode.AppendLine("\t\t\t// Business Dependency injection for Service end");
+            DpCode.AppendLine();
+            DpCode.AppendLine("\t\t\t// DataAccess Dependency injection for Repository start");
+            DpCode.AppendLine("\t\t\t// DataAccess Dependency injection for Repository end");
+            DpCode.AppendLine("\t\t}");
+            DpCode.AppendLine("\t}");
             DpCode.AppendLine("}");
 
             return DpCode.ToString();
         }
+
     }
 }
