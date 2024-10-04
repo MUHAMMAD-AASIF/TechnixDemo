@@ -48,7 +48,6 @@ namespace TechnixDemo
             this.NewProject.BackColor = Color.White;
             this.ExistingPanel.Visible = false;
             this.ExistingProject.BackColor = Color.Khaki;
-
         }
 
         private void folderpathbtn_Click(object sender, EventArgs e)
@@ -131,7 +130,7 @@ namespace TechnixDemo
             {
                 return new ValidatePathModel { Message = "Enter the Solution Path.", IsValid = false };
             }
-            
+
             else if (string.IsNullOrEmpty(projectResponseModel.APIPath))
             {
                 return new ValidatePathModel { Message = "Enter the API Path.", IsValid = false };
@@ -192,8 +191,8 @@ namespace TechnixDemo
             // Combine paths and check if they exist before assigning them to text boxes.
             string projectname = Path.GetFileName(Directory.GetFiles(SolutionPath.Text, "*.sln").FirstOrDefault().Replace("Msc.", "").Replace(".Service.sln", ""));
             var apiPath = Path.Combine(SolutionPath.Text, $"Msc.{projectname}.Service.Api");
-            
-            projectResponseModel.ProjectName =string.IsNullOrEmpty(SolNmTxt.Text)? projectname:SolNmTxt.Text;
+
+            projectResponseModel.ProjectName = string.IsNullOrEmpty(SolNmTxt.Text) ? projectname : SolNmTxt.Text;
             ProcNmTxt.Text = string.IsNullOrEmpty(ProcNmTxt.Text) ? projectname : ProcNmTxt.Text;
 
             projectResponseModel.SolutionPath = apiPath;
@@ -296,6 +295,15 @@ namespace TechnixDemo
         private void GetPathFPBtn_Click(object sender, EventArgs e)
         {
             SelectFolder(SolutionPath);
+        }
+
+        private async void InsPacBtn_Click(object sender, EventArgs e)
+        {
+            
+            GenerateService generateService = new GenerateService(StatusGrid, ProcessProgress);
+            await generateService.InstallPackageAsync(projectResponseModel, "DataAccess.Contracts");
+            await generateService.InstallPackageAsync(projectResponseModel, "Api.Test");
+            await generateService.InstallPackageAsync(projectResponseModel, "Business.Test");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
+using System.Xml.Linq;
 using TechnixDemo.Model;
 
 namespace TechnixDemo.Service
@@ -228,6 +229,78 @@ namespace TechnixDemo.Service
                 // Add more cases as needed
                 default: return clrType;
             }
+        }
+
+        public async Task InstallPackageAsync(ProjectResponseModel projectResponseModel, string projectType)
+        {
+            string newItemGroup = @"
+            <ItemGroup>
+              <PackageReference Include=""Microsoft.EntityFrameworkCore"" Version=""8.0.8"" />
+              <PackageReference Include=""Microsoft.EntityFrameworkCore.SqlServer"" Version=""8.0.8"" />
+              <PackageReference Include=""Microsoft.EntityFrameworkCore.Tools"" Version=""8.0.8"">
+                <PrivateAssets>all</PrivateAssets>
+                <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+              </PackageReference>
+            </ItemGroup>";
+
+            string newPackageReference = @"
+            <PackageReference Include=""Moq"" Version=""4.20.72"" />";
+            string projectFilePath=string.Empty;
+            if (projectType== "DataAccess.Contracts")
+            {
+                projectFilePath = Path.Combine(projectResponseModel.DataAccessContractPath, $"Msc.{projectResponseModel.ProjectName}.Service.{projectType}.csproj");
+            }
+            else if (projectType == "Api.Test")
+            {
+                projectFilePath = Path.Combine(projectResponseModel.APITestPath, $"Msc.{projectResponseModel.ProjectName}.Service.{projectType}.csproj");
+            }
+            else if (projectType == "Business.Test")
+            {
+                projectFilePath = Path.Combine(projectResponseModel.BusinessTestPath, $"Msc.{projectResponseModel.ProjectName}.Service.{projectType}.csproj");
+            }
+
+            XDocument doc = XDocument.Load(projectFilePath);
+
+            if (projectType == "DataAccess.Contracts")
+            {
+                XElement newElement = XElement.Parse(newItemGroup);
+
+                // Find the existing ItemGroup element to replace
+                XElement existingItemGroup = doc.Root.Element("ItemGroup");
+
+                if (existingItemGroup != null)
+                {
+                    existingItemGroup.AddBeforeSelf(newElement);
+                }
+                else
+                {
+                    // If no ItemGroup exists, add the new one
+                    doc.Root.Add(newElement);
+                }
+            }
+            else
+            {
+                XElement newElement = XElement.Parse(newPackageReference);
+
+                // Find the first ItemGroup element that contains PackageReference elements
+                XElement firstItemGroup = doc.Root.Elements("ItemGroup")
+                                                  .FirstOrDefault(ig => ig.Elements("PackageReference").Any());
+
+                if (firstItemGroup != null)
+                {
+                    // Add the new PackageReference to the first ItemGroup
+                    firstItemGroup.Add(newElement);
+                }
+                else
+                {
+                    // If no ItemGroup with PackageReference exists, create a new one
+                    XElement newItemGroupElement = new XElement("ItemGroup", newElement);
+                    doc.Root.Add(newItemGroupElement);
+                }
+            }
+
+            doc.Save(projectFilePath);
+            Console.WriteLine($"New ItemGroup or PackageReference added successfully to {projectType}.");
         }
 
         private async Task ExecuteDotnetCommandAsync(string command, string workingDirectory)

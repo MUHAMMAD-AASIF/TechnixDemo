@@ -40,6 +40,7 @@
             panel1 = new Panel();
             panel6 = new Panel();
             NewPanel = new Panel();
+            InsPacBtn = new Button();
             FrontPanel = new Panel();
             SolNmTxt = new TextBox();
             label2 = new Label();
@@ -107,7 +108,7 @@
             mainframe.Dock = DockStyle.Top;
             mainframe.Location = new Point(0, 0);
             mainframe.Name = "mainframe";
-            mainframe.Size = new Size(681, 79);
+            mainframe.Size = new Size(681, 92);
             mainframe.TabIndex = 3;
             // 
             // panel2
@@ -117,7 +118,7 @@
             panel2.Dock = DockStyle.Right;
             panel2.Location = new Point(420, 0);
             panel2.Name = "panel2";
-            panel2.Size = new Size(261, 79);
+            panel2.Size = new Size(261, 92);
             panel2.TabIndex = 4;
             // 
             // panel4
@@ -146,10 +147,10 @@
             // 
             // pictureBox1
             // 
-            pictureBox1.Image = Properties.Resources.logo_removebg_preview;
-            pictureBox1.Location = new Point(18, 3);
+            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
+            pictureBox1.Location = new Point(3, 4);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(109, 83);
+            pictureBox1.Size = new Size(367, 83);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 2;
             pictureBox1.TabStop = false;
@@ -176,7 +177,7 @@
             panel3.Controls.Add(ExistingProject);
             panel3.Controls.Add(NewProject);
             panel3.Dock = DockStyle.Top;
-            panel3.Location = new Point(0, 79);
+            panel3.Location = new Point(0, 92);
             panel3.Name = "panel3";
             panel3.Size = new Size(681, 29);
             panel3.TabIndex = 8;
@@ -203,7 +204,7 @@
             panel1.BackColor = Color.White;
             panel1.Controls.Add(panel6);
             panel1.Dock = DockStyle.Top;
-            panel1.Location = new Point(0, 108);
+            panel1.Location = new Point(0, 121);
             panel1.Name = "panel1";
             panel1.Size = new Size(681, 434);
             panel1.TabIndex = 30;
@@ -252,11 +253,27 @@
             NewPanel.Controls.Add(label5);
             NewPanel.Controls.Add(APIPathTxt);
             NewPanel.Controls.Add(NextBtn);
+            NewPanel.Controls.Add(InsPacBtn);
             NewPanel.Dock = DockStyle.Left;
             NewPanel.Location = new Point(0, 0);
             NewPanel.Name = "NewPanel";
             NewPanel.Size = new Size(663, 418);
             NewPanel.TabIndex = 33;
+            // 
+            // InsPacBtn
+            // 
+            InsPacBtn.BackColor = SystemColors.ActiveCaptionText;
+            InsPacBtn.FlatAppearance.BorderSize = 0;
+            InsPacBtn.FlatStyle = FlatStyle.Flat;
+            InsPacBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            InsPacBtn.ForeColor = Color.White;
+            InsPacBtn.Location = new Point(420, 337);
+            InsPacBtn.Name = "InsPacBtn";
+            InsPacBtn.Size = new Size(124, 23);
+            InsPacBtn.TabIndex = 75;
+            InsPacBtn.Text = "Install Package";
+            InsPacBtn.UseVisualStyleBackColor = false;
+            InsPacBtn.Click += InsPacBtn_Click;
             // 
             // FrontPanel
             // 
@@ -892,5 +909,6 @@
         private Button folderpathbtn;
         private Label label1;
         private TextBox folderpathTxt;
+        private Button InsPacBtn;
     }
 }

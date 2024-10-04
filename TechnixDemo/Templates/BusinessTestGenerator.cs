@@ -10,7 +10,7 @@ namespace TechnixDemo.Templates
             var testCode = new StringBuilder();
 
             // Add necessary using statements
-            testCode.AppendLine("using Xunit;");
+            testCode.AppendLine("using NUnit.Framework;");
             testCode.AppendLine("using Moq;");
             testCode.AppendLine($"using Msc.{ProjectName}.Service.CommonModel;");
             testCode.AppendLine($"using Msc.{ProjectName}.Service.Business;");
@@ -18,10 +18,11 @@ namespace TechnixDemo.Templates
             testCode.AppendLine();
             testCode.AppendLine($"public class {entity.Entity}ServiceTests");
             testCode.AppendLine("{");
-            testCode.AppendLine($"    private readonly Mock<I{entity.Entity}Repository> _mockDataAccess;");
-            testCode.AppendLine($"    private readonly {entity.Entity}Service _service;");
+            testCode.AppendLine($"    private Mock<I{entity.Entity}Repository> _mockDataAccess;");
+            testCode.AppendLine($"    private {entity.Entity}Service _service;");
             testCode.AppendLine();
-            testCode.AppendLine($"    public {entity.Entity}ServiceTests()");
+            testCode.AppendLine($"    [SetUp]");
+            testCode.AppendLine("    public void Setup()");
             testCode.AppendLine("    {");
             testCode.AppendLine($"        _mockDataAccess = new Mock<I{entity.Entity}Repository>();");
             testCode.AppendLine($"        _service = new {entity.Entity}Service(_mockDataAccess.Object);");
@@ -31,7 +32,7 @@ namespace TechnixDemo.Templates
             // Generate test for GetAll method if enabled
             if (entity.GetAll)
             {
-                testCode.AppendLine($"    [Fact]");
+                testCode.AppendLine($"    [Test]");
                 testCode.AppendLine($"    public void GetAll{entity.Entity}_ReturnsListOfEntities()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
@@ -41,7 +42,7 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"        var result = _service.GetAll();");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
-                testCode.AppendLine($"        Assert.IsType<List<{entity.Entity}>>(result);");
+                testCode.AppendLine($"        Assert.That(result, Is.InstanceOf<List<{entity.Entity}>>());");
                 testCode.AppendLine("    }");
                 testCode.AppendLine();
             }
@@ -49,7 +50,7 @@ namespace TechnixDemo.Templates
             // Generate test for GetById method if enabled
             if (entity.GetById)
             {
-                testCode.AppendLine($"    [Fact]");
+                testCode.AppendLine($"    [Test]");
                 testCode.AppendLine($"    public void Get{entity.Entity}ById_ReturnsEntity_WhenValidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
@@ -60,11 +61,11 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"        var result = _service.GetById(1);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
-                testCode.AppendLine($"        Assert.IsType<{entity.Entity}>(result);");
+                testCode.AppendLine($"        Assert.That(result, Is.InstanceOf<{entity.Entity}>());");
                 testCode.AppendLine("    }");
                 testCode.AppendLine();
 
-                testCode.AppendLine($"    [Fact]");
+                testCode.AppendLine($"    [Test]");
                 testCode.AppendLine($"    public void Get{entity.Entity}ById_ReturnsNull_WhenInvalidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
@@ -74,7 +75,7 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"        var result = _service.GetById(1);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
-                testCode.AppendLine("        Assert.Null(result);");
+                testCode.AppendLine("        Assert.That(result, Is.Null);");
                 testCode.AppendLine("    }");
                 testCode.AppendLine();
             }
@@ -82,7 +83,7 @@ namespace TechnixDemo.Templates
             // Generate test for Save method if enabled
             if (entity.Save)
             {
-                testCode.AppendLine($"    [Fact]");
+                testCode.AppendLine($"    [Test]");
                 testCode.AppendLine($"    public void Save{entity.Entity}_CallsDataAccessSave()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
@@ -100,7 +101,7 @@ namespace TechnixDemo.Templates
             // Generate test for Update method if enabled
             if (entity.Update)
             {
-                testCode.AppendLine($"    [Fact]");
+                testCode.AppendLine($"    [Test]");
                 testCode.AppendLine($"    public void Update{entity.Entity}_ReturnsTrue_WhenValidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
@@ -111,11 +112,11 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"        var result = _service.Update(entity);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
-                testCode.AppendLine($"        Assert.True(result);");
+                testCode.AppendLine($"        Assert.That(result, Is.True);");
                 testCode.AppendLine("    }");
                 testCode.AppendLine();
 
-                testCode.AppendLine($"    [Fact]");
+                testCode.AppendLine($"    [Test]");
                 testCode.AppendLine($"    public void Update{entity.Entity}_ReturnsFalse_WhenInvalidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
@@ -126,7 +127,7 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"        var result = _service.Update(entity);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
-                testCode.AppendLine($"        Assert.False(result);");
+                testCode.AppendLine($"        Assert.That(result, Is.False);");
                 testCode.AppendLine("    }");
                 testCode.AppendLine();
             }
@@ -134,7 +135,7 @@ namespace TechnixDemo.Templates
             // Generate test for Delete method if enabled
             if (entity.Delete)
             {
-                testCode.AppendLine($"    [Fact]");
+                testCode.AppendLine($"    [Test]");
                 testCode.AppendLine($"    public void Delete{entity.Entity}_ReturnsTrue_WhenValidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
@@ -144,11 +145,11 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"        var result = _service.Delete(1);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
-                testCode.AppendLine($"        Assert.True(result);");
+                testCode.AppendLine($"        Assert.That(result, Is.True);");
                 testCode.AppendLine("    }");
                 testCode.AppendLine();
 
-                testCode.AppendLine($"    [Fact]");
+                testCode.AppendLine($"    [Test]");
                 testCode.AppendLine($"    public void Delete{entity.Entity}_ReturnsFalse_WhenInvalidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
@@ -158,7 +159,7 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"        var result = _service.Delete(1);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Assert");
-                testCode.AppendLine($"        Assert.False(result);");
+                testCode.AppendLine($"        Assert.That(result, Is.False);");
                 testCode.AppendLine("    }");
                 testCode.AppendLine();
             }

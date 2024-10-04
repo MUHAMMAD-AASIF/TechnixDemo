@@ -31,6 +31,8 @@ namespace TechnixDemo.Service
                     if (File.Exists(outputPath))
                     {
                         SaveProgramFile(_filePathRes.ProjectName, outputPath);
+                        DeleteDefaultFiles(_filePathRes.SolutionPath, _filePathRes.ProjectName);
+                        AddRefforCommonModelFile();
                     }
                 }
 
@@ -120,6 +122,31 @@ namespace TechnixDemo.Service
             }
         }
 
+        private void DeleteDefaultFiles(string solutionDirectory, string projectName)
+        {
+            // Define default files to delete
+            string[] defaultFiles = { "Class1.cs", "UnitTest1.cs" };
+
+            // List of projects that may have the default files
+            string[] projects = { "Api", "Api.Test", "Business", "Business.Contracts", "Business.Test", "DataAccess", "DataAccess.Contracts", "CommonModel" };
+
+            foreach (var project in projects)
+            {
+                var projectDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{project}");
+
+                foreach (var file in defaultFiles)
+                {
+                    var filePath = Path.Combine(projectDirectory, file);
+
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                        Console.WriteLine($"Deleted {filePath}");
+                    }
+                }
+            }
+        }
+
         public void UpdateDependencyInjectionForEntity(string entityName)
         {
             try
@@ -156,6 +183,24 @@ namespace TechnixDemo.Service
             string dpCode = new DependencyInjection().GenerateDependencyInjection(_filePathRes.ProjectName);
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? string.Empty);
             File.WriteAllText(outputPath, dpCode);
+        }
+
+        public void AddRefforCommonModelFile()
+        {
+            string outputPath = Path.Combine(_filePathRes.DataAccessContractPath, "Context", "AppDbContext.cs");
+            string FindDt = "using Microsoft.EntityFrameworkCore;";
+            string ReplaceDt = "using Microsoft.EntityFrameworkCore;\nusing Msc.OVA.Service.CommonModel;";
+            if (File.Exists(outputPath))
+            {
+                string fileContent = File.ReadAllText(outputPath);
+                string updatedContent = Regex.Replace(fileContent, Regex.Escape(FindDt), ReplaceDt);
+
+                if (!fileContent.Equals(updatedContent))
+                {
+                    File.WriteAllText(outputPath, updatedContent);
+                }
+            }
+            
         }
 
         public void MoveOtherFilesExceptAppDbContext()

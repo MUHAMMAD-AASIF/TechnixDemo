@@ -20,10 +20,6 @@ namespace TechnixDemo.Templates
             programCode.AppendLine("ContainerExtension.LoadCustomConfiguration(builder.Services);");
             programCode.AppendLine("builder.Services.AddControllers().AddJsonOptions(options =>");
             programCode.AppendLine("{");
-            programCode.AppendLine("    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;");
-            programCode.AppendLine("});");
-            programCode.AppendLine("builder.Services.AddControllers().AddJsonOptions(options =>");
-            programCode.AppendLine("{");
             programCode.AppendLine("    options.JsonSerializerOptions.MaxDepth = 64;");
             programCode.AppendLine("});");
             programCode.AppendLine("builder.Services.AddControllers();");
