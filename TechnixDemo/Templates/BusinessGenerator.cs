@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using TechnixDemo.Model;
 
 namespace TechnixDemo.Templates
 {
     public class BusinessGenerator
     {
-
         public string GenerateBusiness(EntitySelectModel entity, string ProjectName)
         {
             var serviceCode = new StringBuilder();
@@ -21,86 +16,86 @@ namespace TechnixDemo.Templates
             serviceCode.AppendLine();
             serviceCode.AppendLine($"namespace Msc.{ProjectName}.Service.Business");
             serviceCode.AppendLine("{");
-            serviceCode.AppendLine($"    public class {entity.Entity}Service : I{entity.Entity}Service");
-            serviceCode.AppendLine("    {");
-            serviceCode.AppendLine($"        private readonly I{entity.Entity}Repository _{entity.Entity.ToLower()}Repository;");
+            serviceCode.AppendLine($"\tpublic class {entity.Entity}Service : I{entity.Entity}Service");
+            serviceCode.AppendLine("\t{");
+            serviceCode.AppendLine($"\t\tprivate readonly I{entity.Entity}Repository _{entity.Entity.ToLower()}Repository;");
             serviceCode.AppendLine();
-            serviceCode.AppendLine($"        public {entity.Entity}Service(I{entity.Entity}Repository {entity.Entity.ToLower()}Repository)");
-            serviceCode.AppendLine("        {");
-            serviceCode.AppendLine($"            _{entity.Entity.ToLower()}Repository = {entity.Entity.ToLower()}Repository;");
-            serviceCode.AppendLine("        }");
+            serviceCode.AppendLine($"\t\tpublic {entity.Entity}Service(I{entity.Entity}Repository {entity.Entity.ToLower()}Repository)");
+            serviceCode.AppendLine("\t\t{");
+            serviceCode.AppendLine($"\t\t\t_{entity.Entity.ToLower()}Repository = {entity.Entity.ToLower()}Repository;");
+            serviceCode.AppendLine("\t\t}");
             serviceCode.AppendLine();
 
             if (entity.GetAll)
             {
-                serviceCode.AppendLine($"        public IEnumerable<{entity.Entity}> GetAll()");
-                serviceCode.AppendLine("        {");
-                serviceCode.AppendLine("            // Retrieve all records from the repository");
-                serviceCode.AppendLine($"            return _{entity.Entity.ToLower()}Repository.GetAll();");
-                serviceCode.AppendLine("        }");
+                serviceCode.AppendLine($"\t\tpublic IEnumerable<{entity.Entity}> GetAll()");
+                serviceCode.AppendLine("\t\t{");
+                serviceCode.AppendLine("\t\t\t// Retrieve all records from the repository");
+                serviceCode.AppendLine($"\t\t\treturn _{entity.Entity.ToLower()}Repository.GetAll();");
+                serviceCode.AppendLine("\t\t}");
                 serviceCode.AppendLine();
             }
 
             if (entity.GetById)
             {
-                serviceCode.AppendLine($"        public {entity.Entity} GetById(int id)");
-                serviceCode.AppendLine("        {");
-                serviceCode.AppendLine("            // Retrieve a single record by ID from the repository");
-                serviceCode.AppendLine($"            return _{entity.Entity.ToLower()}Repository.GetById(id);");
-                serviceCode.AppendLine("        }");
+                serviceCode.AppendLine($"\t\tpublic {entity.Entity} GetById(int id)");
+                serviceCode.AppendLine("\t\t{");
+                serviceCode.AppendLine("\t\t\t// Retrieve a single record by ID from the repository");
+                serviceCode.AppendLine($"\t\t\treturn _{entity.Entity.ToLower()}Repository.GetById(id);");
+                serviceCode.AppendLine("\t\t}");
                 serviceCode.AppendLine();
             }
 
             if (entity.Save)
             {
-                serviceCode.AppendLine($"        public {entity.Entity} Save({entity.Entity} model)");
-                serviceCode.AppendLine("        {");
-                serviceCode.AppendLine("            // Validate the model");
-                serviceCode.AppendLine("            if (model == null)");
-                serviceCode.AppendLine("            {");
-                serviceCode.AppendLine("                throw new ArgumentNullException(nameof(model));");
-                serviceCode.AppendLine("            }");
+                serviceCode.AppendLine($"\t\tpublic {entity.Entity} Save({entity.Entity} model)");
+                serviceCode.AppendLine("\t\t{");
+                serviceCode.AppendLine("\t\t\t// Validate the model");
+                serviceCode.AppendLine("\t\t\tif (model == null)");
+                serviceCode.AppendLine("\t\t\t{");
+                serviceCode.AppendLine("\t\t\t\tthrow new ArgumentNullException(nameof(model));");
+                serviceCode.AppendLine("\t\t\t}");
                 serviceCode.AppendLine();
-                serviceCode.AppendLine("            // Save the new record in the repository");
-                serviceCode.AppendLine($"            return _{entity.Entity.ToLower()}Repository.Save(model);");
-                serviceCode.AppendLine("        }");
+                serviceCode.AppendLine("\t\t\t// Save the new record in the repository");
+                serviceCode.AppendLine($"\t\t\treturn _{entity.Entity.ToLower()}Repository.Save(model);");
+                serviceCode.AppendLine("\t\t}");
                 serviceCode.AppendLine();
             }
 
             if (entity.Update)
             {
-                serviceCode.AppendLine($"        public bool Update({entity.Entity} model)");
-                serviceCode.AppendLine("        {");
-                serviceCode.AppendLine("            // Validate the model");
-                serviceCode.AppendLine("            if (model == null)");
-                serviceCode.AppendLine("            {");
-                serviceCode.AppendLine("                throw new ArgumentException(\"Invalid model \");");
-                serviceCode.AppendLine("            }");
+                serviceCode.AppendLine($"\t\tpublic bool Update({entity.Entity} model)");
+                serviceCode.AppendLine("\t\t{");
+                serviceCode.AppendLine("\t\t\t// Validate the model");
+                serviceCode.AppendLine("\t\t\tif (model == null)");
+                serviceCode.AppendLine("\t\t\t{");
+                serviceCode.AppendLine("\t\t\t\tthrow new ArgumentException(\"Invalid model \");");
+                serviceCode.AppendLine("\t\t\t}");
                 serviceCode.AppendLine();
-                serviceCode.AppendLine("            // Update the record in the repository");
-                serviceCode.AppendLine($"            return _{entity.Entity.ToLower()}Repository.Update(model);");
-                serviceCode.AppendLine("        }");
+                serviceCode.AppendLine("\t\t\t// Update the record in the repository");
+                serviceCode.AppendLine($"\t\t\treturn _{entity.Entity.ToLower()}Repository.Update(model);");
+                serviceCode.AppendLine("\t\t}");
                 serviceCode.AppendLine();
             }
 
             if (entity.Delete)
             {
-                serviceCode.AppendLine($"        public bool Delete(int id)");
-                serviceCode.AppendLine("        {");
-                serviceCode.AppendLine("            // Ensure the record exists before attempting to delete");
-                serviceCode.AppendLine($"            var existingEntity = _{entity.Entity.ToLower()}Repository.GetById(id);");
-                serviceCode.AppendLine("            if (existingEntity == null)");
-                serviceCode.AppendLine("            {");
-                serviceCode.AppendLine("                return false;");
-                serviceCode.AppendLine("            }");
+                serviceCode.AppendLine($"\t\tpublic bool Delete(int id)");
+                serviceCode.AppendLine("\t\t{");
+                serviceCode.AppendLine("\t\t\t// Ensure the record exists before attempting to delete");
+                serviceCode.AppendLine($"\t\t\tvar existingEntity = _{entity.Entity.ToLower()}Repository.GetById(id);");
+                serviceCode.AppendLine("\t\t\tif (existingEntity == null)");
+                serviceCode.AppendLine("\t\t\t{");
+                serviceCode.AppendLine("\t\t\t\treturn false;");
+                serviceCode.AppendLine("\t\t\t}");
                 serviceCode.AppendLine();
-                serviceCode.AppendLine("            // Delete the record from the repository");
-                serviceCode.AppendLine($"            return _{entity.Entity.ToLower()}Repository.Delete(id);");
-                serviceCode.AppendLine("        }");
+                serviceCode.AppendLine("\t\t\t// Delete the record from the repository");
+                serviceCode.AppendLine($"\t\t\treturn _{entity.Entity.ToLower()}Repository.Delete(id);");
+                serviceCode.AppendLine("\t\t}");
                 serviceCode.AppendLine();
             }
 
-            serviceCode.AppendLine("    }");
+            serviceCode.AppendLine("\t}");
             serviceCode.AppendLine("}");
 
             return serviceCode.ToString();

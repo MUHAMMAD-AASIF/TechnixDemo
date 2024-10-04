@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using TechnixDemo.Model;
 using TechnixDemo.Templates;
 
@@ -15,40 +8,53 @@ namespace TechnixDemo.Service
     public class FileGenerateService
     {
         private readonly List<EntitySelectModel> _entities;
-        private readonly ProjectResponseModel _filepathRes;
-        public FileGenerateService(List<EntitySelectModel> entities, ProjectResponseModel filepathRes)
+        private readonly ProjectResponseModel _filePathRes;
+        public FileGenerateService(List<EntitySelectModel> entities, ProjectResponseModel filePathRes)
         {
             _entities = entities;
-            _filepathRes = filepathRes;
+            _filePathRes = filePathRes;
         }
 
-        public bool GenerateFile()
+        public bool ProcessFileGeneration()
         {
             try
             {
-                string filePath = Path.Combine(_filepathRes.APIPath, "App_Start", "ContainerExtension.cs");
+                string containerExtensionPath = Path.Combine(_filePathRes.APIPath, "App_Start", "ContainerExtension.cs");
 
-                if (!File.Exists(filePath))
+                // Generate Dependency Injection file if it doesn't exist
+                if (!File.Exists(containerExtensionPath))
                 {
-                    GenerateDependencyInjection();
+                    GenerateDependencyInjectionFile();
+
+                    string outputPath = Path.Combine(_filePathRes.APIPath, "Program.cs"); 
+
+                    if (File.Exists(outputPath))
+                    {
+                        SaveProgramFile(_filePathRes.ProjectName, outputPath);
+                        DeleteDefaultFiles(_filePathRes.SolutionPath, _filePathRes.ProjectName);
+                        AddRefforCommonModelFile();
+                    }
                 }
 
-                string MoveFilePath = Path.Combine(_filepathRes.DataAccessContractPath, "Context", "AppDbContext.cs");
+                string appDbContextPath = Path.Combine(_filePathRes.DataAccessContractPath, "Context", "AppDbContext.cs");
 
-                if (File.Exists(MoveFilePath))
+                // Move files except AppDbContext.cs if the file exists
+                if (File.Exists(appDbContextPath))
                 {
-                    MoveFilesExcept();
+                    MoveOtherFilesExceptAppDbContext();
                 }
 
-                ReplaceStringInAllFilesInDirectory();
+                // Update file content in the directory
+                UpdateCommonModelFileReferences();
 
-                foreach (EntitySelectModel entitySelectModel in _entities)
+                // Generate required files for each entity
+                foreach (var entity in _entities)
                 {
-                    string controllerPath = Path.Combine(_filepathRes.APIPath, "Controllers", $"{entitySelectModel.Entity}Controller.cs");
+                    string controllerPath = Path.Combine(_filePathRes.APIPath, "Controllers", $"{entity.Entity}Controller.cs");
 
                     if (!File.Exists(controllerPath))
                     {
-                        GenerateAllFile(entitySelectModel);
+                        GenerateEntityFiles(entity);
                     }
                 }
 
@@ -56,63 +62,56 @@ namespace TechnixDemo.Service
             }
             catch (Exception)
             {
-                // Handle exception (log, rethrow, etc.)
+                // Log or handle exception
                 return false;
             }
         }
 
-        public void GenerateAllFile(EntitySelectModel entity)
+        public void GenerateEntityFiles(EntitySelectModel entity)
         {
             var fileTemplates = new Dictionary<string, string>
             {
-                { "Controller", Path.Combine(_filepathRes.APIPath, "Controllers", $"{entity.Entity}Controller.cs") },
-                { "Business", Path.Combine(_filepathRes.BusinessPath, $"{entity.Entity}Service.cs") },
-                { "Business.Contracts", Path.Combine(_filepathRes.BusinessContractPath, "Interfaces", $"I{entity.Entity}Service.cs") },
-                { "DataAccess", Path.Combine(_filepathRes.DataAccessPath, $"{entity.Entity}Repository.cs") },
-                { "DataAccess.Contracts", Path.Combine(_filepathRes.DataAccessContractPath, "Interfaces", $"I{entity.Entity}Repository.cs") },
-                { "API.Test", Path.Combine(_filepathRes.APITestPath, "UnitTest", $"{entity.Entity}ControllerUnitTest.cs") },
-                { "Business.Test", Path.Combine(_filepathRes.BusinessTestPath, "UnitTest", $"{entity.Entity}ServiceUnitTest.cs") }
+                { "Controller", Path.Combine(_filePathRes.APIPath, "Controllers", $"{entity.Entity}Controller.cs") },
+                { "Business", Path.Combine(_filePathRes.BusinessPath, $"{entity.Entity}Service.cs") },
+                { "Business.Contracts", Path.Combine(_filePathRes.BusinessContractPath, "Interfaces", $"I{entity.Entity}Service.cs") },
+                { "DataAccess", Path.Combine(_filePathRes.DataAccessPath, $"{entity.Entity}Repository.cs") },
+                { "DataAccess.Contracts", Path.Combine(_filePathRes.DataAccessContractPath, "Interfaces", $"I{entity.Entity}Repository.cs") },
+                { "API.Test", Path.Combine(_filePathRes.APITestPath, "UnitTest", $"{entity.Entity}ControllerUnitTest.cs") },
+                { "Business.Test", Path.Combine(_filePathRes.BusinessTestPath, "UnitTest", $"{entity.Entity}ServiceUnitTest.cs") }
             };
 
             foreach (var template in fileTemplates)
             {
                 GenerateFileFromTemplate(template.Key, template.Value, entity);
             }
-            ReplaceStringInFileForDP(entity.Entity);
+
+            UpdateDependencyInjectionForEntity(entity.Entity);
         }
 
-        public void ReplaceStringInAllFilesInDirectory()
+        public void SaveProgramFile(string projectName, string filePath)
+        {
+            string programCode = new ProgramGenerator().GenerateProgramFile(projectName);
+            File.WriteAllText(filePath, programCode);
+        }
+
+        public void UpdateCommonModelFileReferences()
         {
             try
             {
-                string oldValue = $"Msc.{_filepathRes.ProjectName}.Service.DataAccess.Contracts.Context";
-                string newValue = $"Msc.{_filepathRes.ProjectName}.Service.CommonModel";
+                string oldNamespace = $"Msc.{_filePathRes.ProjectName}.Service.DataAccess.Contracts.Context";
+                string newNamespace = $"Msc.{_filePathRes.ProjectName}.Service.CommonModel";
+                string directoryPath = _filePathRes.CommonModelPath;
 
-                string directoryPath = _filepathRes.CommonModelPath;
-
-                // Get all files in the specified directory
-                string[] files = Directory.GetFiles(directoryPath);
-
-                foreach (var filePath in files)
+                foreach (var filePath in Directory.GetFiles(directoryPath))
                 {
-                    // Check if the file exists before proceeding
                     if (File.Exists(filePath))
                     {
-                        // Read the file content
                         string fileContent = File.ReadAllText(filePath);
+                        string updatedContent = fileContent.Replace(oldNamespace, newNamespace);
 
-                        // Replace the old value with the new value
-                        string updatedContent = fileContent.Replace(oldValue, newValue);
-
-                        // Write the updated content back to the file only if changes were made
-                        if (fileContent != updatedContent)
+                        if (!fileContent.Equals(updatedContent))
                         {
                             File.WriteAllText(filePath, updatedContent);
-                            Console.WriteLine($"File '{filePath}' updated successfully.");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"No changes made in file '{filePath}'. The content was already up to date.");
                         }
                     }
                 }
@@ -123,44 +122,53 @@ namespace TechnixDemo.Service
             }
         }
 
+        private void DeleteDefaultFiles(string solutionDirectory, string projectName)
+        {
+            // Define default files to delete
+            string[] defaultFiles = { "Class1.cs", "UnitTest1.cs" };
 
-        public void ReplaceStringInFileForDP(string entityName)
+            // List of projects that may have the default files
+            string[] projects = { "Api", "Api.Test", "Business", "Business.Contracts", "Business.Test", "DataAccess", "DataAccess.Contracts", "CommonModel" };
+
+            foreach (var project in projects)
+            {
+                var projectDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{project}");
+
+                foreach (var file in defaultFiles)
+                {
+                    var filePath = Path.Combine(projectDirectory, file);
+
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                        Console.WriteLine($"Deleted {filePath}");
+                    }
+                }
+            }
+        }
+
+        public void UpdateDependencyInjectionForEntity(string entityName)
         {
             try
             {
-                string oldValue1 = "// Business Dependency injection for Service end";
-                string oldValue2 = "// DataAccess Dependency injection for Repository end";
+                string businessInjectionPoint = "// Business Dependency injection for Service end";
+                string dataAccessInjectionPoint = "// DataAccess Dependency injection for Repository end";
 
-                string newValue1 = $"\t\t\tServices.AddScoped<I{entityName}Service, {entityName}Service>();\n\t\t\t{oldValue1}";
-                string newValue2 = $"\t\t\tServices.AddScoped<I{entityName}Repository, {entityName}Repository>();\n\t\t\t{oldValue2}";
+                string businessInjectionCode = $"\t\t\tServices.AddScoped<I{entityName}Service, {entityName}Service>();\n\t\t\t{businessInjectionPoint}";
+                string dataAccessInjectionCode = $"\t\t\tServices.AddScoped<I{entityName}Repository, {entityName}Repository>();\n\t\t\t{dataAccessInjectionPoint}";
 
-                string filePath = Path.Combine(_filepathRes.APIPath, "App_Start", "ContainerExtension.cs");
+                string containerExtensionPath = Path.Combine(_filePathRes.APIPath, "App_Start", "ContainerExtension.cs");
 
-                // Check if the file exists before proceeding
-                if (File.Exists(filePath))
+                if (File.Exists(containerExtensionPath))
                 {
-                    // Read the file content
-                    string fileContent = File.ReadAllText(filePath);
+                    string fileContent = File.ReadAllText(containerExtensionPath);
+                    string updatedContent = Regex.Replace(fileContent, Regex.Escape(businessInjectionPoint), businessInjectionCode);
+                    updatedContent = Regex.Replace(updatedContent, Regex.Escape(dataAccessInjectionPoint), dataAccessInjectionCode);
 
-                    // Replace both old values with their respective new values
-                    string updatedContent = Regex.Replace(fileContent, Regex.Escape(oldValue1), newValue1);
-                    updatedContent = Regex.Replace(updatedContent, Regex.Escape(oldValue2), newValue2);
-
-
-                    // Write the updated content back to the file only if changes were made
-                    if (fileContent != updatedContent)
+                    if (!fileContent.Equals(updatedContent))
                     {
-                        File.WriteAllText(filePath, updatedContent);
-                        Console.WriteLine("File updated successfully.");
+                        File.WriteAllText(containerExtensionPath, updatedContent);
                     }
-                    else
-                    {
-                        Console.WriteLine("No changes made. The content was already up to date.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("File does not exist.");
                 }
             }
             catch (Exception ex)
@@ -169,45 +177,52 @@ namespace TechnixDemo.Service
             }
         }
 
-
-
-        public void GenerateDependencyInjection()
+        public void GenerateDependencyInjectionFile()
         {
-            var outputPath = Path.Combine(_filepathRes.APIPath, "App_Start", $"ContainerExtension.cs");
-            var DpData = new DependencyInjection().GenerateDependencyInjection(_filepathRes.ProjectName);
-            Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? string.Empty); // Ensure the directory exists
-            File.WriteAllText(outputPath, DpData);
+            string outputPath = Path.Combine(_filePathRes.APIPath, "App_Start", "ContainerExtension.cs");
+            string dpCode = new DependencyInjection().GenerateDependencyInjection(_filePathRes.ProjectName);
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? string.Empty);
+            File.WriteAllText(outputPath, dpCode);
         }
 
-        public void MoveFilesExcept()
+        public void AddRefforCommonModelFile()
+        {
+            string outputPath = Path.Combine(_filePathRes.DataAccessContractPath, "Context", "AppDbContext.cs");
+            string FindDt = "using Microsoft.EntityFrameworkCore;";
+            string ReplaceDt = "using Microsoft.EntityFrameworkCore;\nusing Msc.OVA.Service.CommonModel;";
+            if (File.Exists(outputPath))
+            {
+                string fileContent = File.ReadAllText(outputPath);
+                string updatedContent = Regex.Replace(fileContent, Regex.Escape(FindDt), ReplaceDt);
+
+                if (!fileContent.Equals(updatedContent))
+                {
+                    File.WriteAllText(outputPath, updatedContent);
+                }
+            }
+            
+        }
+
+        public void MoveOtherFilesExceptAppDbContext()
         {
             try
             {
-                var sourceDirectory = Path.Combine(_filepathRes.DataAccessContractPath, "Context");
-                var destinationDirectory = Path.Combine(_filepathRes.CommonModelPath);
-                string fileToExclude = "AppDbContext.cs";
+                var sourceDirectory = Path.Combine(_filePathRes.DataAccessContractPath, "Context");
+                var destinationDirectory = _filePathRes.CommonModelPath;
+                string excludedFile = "AppDbContext.cs";
 
-                // Ensure the destination directory exists
                 if (!Directory.Exists(destinationDirectory))
                 {
                     Directory.CreateDirectory(destinationDirectory);
                 }
 
-                // Get all files in the source directory
-                string[] files = Directory.GetFiles(sourceDirectory);
-
-                foreach (string filePath in files)
+                foreach (var filePath in Directory.GetFiles(sourceDirectory))
                 {
-                    // Get the file name from the full path
                     string fileName = Path.GetFileName(filePath);
 
-                    // Check if the file is the one to exclude
-                    if (!fileName.Equals(fileToExclude, StringComparison.OrdinalIgnoreCase))
+                    if (!fileName.Equals(excludedFile, StringComparison.OrdinalIgnoreCase))
                     {
-                        // Define the destination file path
                         string destinationPath = Path.Combine(destinationDirectory, fileName);
-
-                        // Move the file to the destination directory
                         File.Move(filePath, destinationPath);
                         Console.WriteLine($"Moved: {fileName}");
                     }
@@ -219,35 +234,54 @@ namespace TechnixDemo.Service
             }
             catch (Exception ex)
             {
-                // Handle exceptions
                 Console.WriteLine($"Error during file move: {ex.Message}");
             }
         }
-
 
         private void GenerateFileFromTemplate(string type, string outputPath, EntitySelectModel entity)
         {
             var generators = new Dictionary<string, Func<string>>
             {
-                { "Controller", () => new ApiGenerator().GenerateController(entity, _filepathRes.ProjectName) },
-                { "Business", () => new BusinessGenerator().GenerateBusiness(entity, _filepathRes.ProjectName) },
-                { "Business.Contracts", () => new BusinessContractGenerator().GenerateBusinessContract(entity, _filepathRes.ProjectName) },
-                { "DataAccess", () => new DataAccessGenerator().GenerateDataAccess(entity, _filepathRes.ProjectName) },
-                { "DataAccess.Contracts", () => new DataAccessContractGenerator().GenerateDataAccessContract(entity, _filepathRes.ProjectName) },
-                { "API.Test", () => new ApiTestGenerator().GenerateApiTest(entity, _filepathRes.ProjectName) },
-                { "Business.Test", () => new BusinessTestGenerator().GenerateBusinessTests(entity, _filepathRes.ProjectName) }
+                { "Controller", () => new ApiGenerator().GenerateController(entity, _filePathRes.ProjectName) },
+                { "Business", () => new BusinessGenerator().GenerateBusiness(entity, _filePathRes.ProjectName) },
+                { "Business.Contracts", () => new BusinessContractGenerator().GenerateBusinessContract(entity, _filePathRes.ProjectName) },
+                { "DataAccess", () => new DataAccessGenerator().GenerateDataAccess(entity, _filePathRes.ProjectName) },
+                { "DataAccess.Contracts", () => new DataAccessContractGenerator().GenerateDataAccessContract(entity, _filePathRes.ProjectName) },
+                { "API.Test", () => new ApiTestGenerator().GenerateApiTest(entity, _filePathRes.ProjectName) },
+                { "Business.Test", () => new BusinessTestGenerator().GenerateBusinessTests(entity, _filePathRes.ProjectName) }
             };
 
             if (generators.TryGetValue(type, out var generator))
             {
-                string outputContent = generator();
-                Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? string.Empty); // Ensure the directory exists
-                File.WriteAllText(outputPath, outputContent);
+                string fileContent = generator();
+                Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? string.Empty);
+                File.WriteAllText(outputPath, fileContent);
             }
             else
             {
-                throw new ArgumentException($"Invalid type: {type}");
+                throw new ArgumentException($"Invalid file type: {type}");
             }
         }
+
+        public void RunScaffold()
+        {
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = "ef dbcontext scaffold \"Your_Connection_String\" Microsoft.EntityFrameworkCore.SqlServer -o Models",
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = Process.Start(processInfo))
+            {
+                process.OutputDataReceived += (sender, args) => Console.WriteLine(args.Data);
+                process.BeginOutputReadLine();
+                process.WaitForExit();
+            }
+        }
+
     }
 }

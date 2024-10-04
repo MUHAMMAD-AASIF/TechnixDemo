@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.IO.Compression;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using TechnixDemo.Model;
-using System.Data;
-using System.Data.SqlClient;
 
 namespace TechnixDemo.Service
 {
@@ -47,7 +39,7 @@ namespace TechnixDemo.Service
                 responseModel.SolutionPath = solutionDirectory;
                 await ExecuteDotnetCommandAsync($"new sln --name Msc.{solutionName}.Service", solutionDirectory);
                 UpdateDataGridView("Create Solution", "Completed");
-                UpdateProgress(5);
+                UpdateProgress(10);
 
                 // Create Web API Project
                 UpdateDataGridView("Create Web API Project", "Started");
@@ -55,14 +47,7 @@ namespace TechnixDemo.Service
                 responseModel.ProjectPath = webApiProjectDirectory;
                 await ExecuteDotnetCommandAsync($"new webapi --name Msc.{projectName}.Service.Api", solutionDirectory);
                 UpdateDataGridView("Create Web API Project", "Completed");
-                UpdateProgress(15);
-
-                // Create Blazor Server Project
-                UpdateDataGridView("Create Blazor Server Project", "Started");
-                var blazorServerProjectDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Client");
-                await ExecuteDotnetCommandAsync($"new blazorserver --name Msc.{projectName}.Client", solutionDirectory);
-                UpdateDataGridView("Create Blazor Server Project", "Completed");
-                UpdateProgress(25);
+                UpdateProgress(20);
 
                 // Create Class Library Projects
                 var classLibraryNames = new[] { "Business", "Business.Contracts", "CommonModel", "DataAccess", "DataAccess.Contracts" };
@@ -72,7 +57,7 @@ namespace TechnixDemo.Service
                     var classLibraryDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{libraryName}");
                     await ExecuteDotnetCommandAsync($"new classlib --name Msc.{projectName}.Service.{libraryName}", solutionDirectory);
                     UpdateDataGridView($"Create {libraryName} Class Library", "Completed");
-                    UpdateProgress(25 + Array.IndexOf(classLibraryNames, libraryName) * 10);
+                    UpdateProgress(20 + Array.IndexOf(classLibraryNames, libraryName) * 5);
                 }
 
                 // Create NUnit Test Projects
@@ -83,15 +68,14 @@ namespace TechnixDemo.Service
                     var testProjectDirectory = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{testName}.Test");
                     await ExecuteDotnetCommandAsync($"new nunit --name Msc.{projectName}.Service.{testName}.Test", solutionDirectory);
                     UpdateDataGridView($"Create NUnit {testName} Test Project", "Completed");
+                    UpdateProgress(40 + Array.IndexOf(testProjectNames, testName) * 5);
                 }
-                UpdateProgress(55);
 
                 // Add projects to solution
                 UpdateDataGridView("Add Projects to Solution", "Started");
                 var projectPaths = new List<string>
                 {
                     Path.Combine(webApiProjectDirectory, $"Msc.{projectName}.Service.Api.csproj"),
-                    Path.Combine(blazorServerProjectDirectory, $"Msc.{projectName}.Client.csproj"),
                     Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business", $"Msc.{projectName}.Service.Business.csproj"),
                     Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Contracts", $"Msc.{projectName}.Service.Business.Contracts.csproj"),
                     Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.CommonModel", $"Msc.{projectName}.Service.CommonModel.csproj"),
@@ -106,11 +90,10 @@ namespace TechnixDemo.Service
                     await ExecuteDotnetCommandAsync($"sln {Path.Combine(solutionDirectory, $"Msc.{solutionName}.Service.sln")} add {projectPath}", solutionDirectory);
                 }
                 UpdateDataGridView("Add Projects to Solution", "Completed");
-                UpdateProgress(80);
+                UpdateProgress(60);
 
                 // Create Project Folders (for Web API Project)
                 UpdateDataGridView("Create Project Folders", "Started");
-                //CreateProjectFolders(solutionDirectory, projectName);
                 responseModel.APIPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api");
                 responseModel.BusinessPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business");
                 responseModel.BusinessContractPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Contracts");
@@ -120,11 +103,11 @@ namespace TechnixDemo.Service
                 responseModel.APITestPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.API.Test");
                 responseModel.BusinessTestPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Test");
                 UpdateDataGridView("Create Project Folders", "Completed");
-                UpdateProgress(90);
+                UpdateProgress(70);
 
                 // Add References Between Projects
                 await AddReferencesBetweenProjects(solutionDirectory, projectName);
-                //await AddTestProjectReferences(solutionDirectory, projectName, testProjectNames, classLibraryNames);
+                UpdateProgress(80);
 
                 // Open Solution
                 UpdateDataGridView("Open Solution", "Started");
@@ -166,8 +149,6 @@ namespace TechnixDemo.Service
                 foreach (var reference in project.Value)
                 {
                     var referencePath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.{reference}", $"Msc.{projectName}.Service.{reference}.csproj");
-
-                    // Add reference if it doesn't already exist
                     await ExecuteDotnetCommandAsync($"add {projectPath} reference {referencePath}", solutionDirectory);
                 }
             }
@@ -234,63 +215,6 @@ namespace TechnixDemo.Service
             }
         }
 
-        //private void CreateProjectFolders(string projectDirectory, string projectName)
-        //{
-        //    // API Project
-        //    var apiPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Api");
-        //    var APIlistFolder = new List<string>() {
-        //    "App_Start","Controllers","Extension","Helpers","Infrastructure","Mapping","Resource"
-        //    };
-        //    CreateFolderAndAddToCsproj(apiPath, APIlistFolder);
-
-        //    // API Test Project
-        //    var apiTestPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Api.Test");
-        //    CreateFolderAndAddToCsproj(apiTestPath, new List<string>() { "UnitTest" });
-
-        //    // Business Test Project
-        //    var businessTestPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Business.Test");
-        //    CreateFolderAndAddToCsproj(businessTestPath, new List<string>() { "UnitTest" });
-
-        //    // Business Contracts Project
-        //    var businessContractsPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.Business.Contracts");
-        //    CreateFolderAndAddToCsproj(businessContractsPath, new List<string>() { "Interfaces" });
-
-        //    // Data Access Contracts Project
-        //    var dataAccessContractsPath = Path.Combine(projectDirectory, $"Msc.{projectName}.Service.DataAccess.Contracts");
-        //    CreateFolderAndAddToCsproj(dataAccessContractsPath, new List<string>() { "Interfaces" });
-        //}
-
-        //private void CreateFolderAndAddToCsproj(string projectDirectory, List<string> forlders)
-        //{
-        //    //var itemGroup = "<ItemGroup/>\n";
-        //    foreach (var folderName in forlders)
-        //    {
-        //        var folderPath = Path.Combine(projectDirectory, folderName);
-        //        if (!Directory.Exists(folderPath))
-        //        {
-        //            Directory.CreateDirectory(folderPath);
-        //        }
-
-        //        //var csprojPath = Directory.GetFiles(projectDirectory, "*.csproj").FirstOrDefault();
-        //        //if (csprojPath != null)
-        //        //{
-        //        //    var csprojContent = File.ReadAllText(csprojPath);
-
-        //        //    var newFolder = $"<Folder Include=\"{folderName}\\\" />\n";
-        //        //    var foldergroup = "<ItemGroup>";
-        //        //    if (!csprojContent.Contains(newFolder))
-        //        //    {
-        //        //        csprojContent = csprojContent.Replace(itemGroup, itemGroup + newFolder);
-        //        //        File.WriteAllText(csprojPath, csprojContent);
-        //        //    }
-        //        //}
-        //    }
-
-
-        //}
-
-
-
         private string GetPropertyType(string clrType)
         {
             switch (clrType)
@@ -305,6 +229,78 @@ namespace TechnixDemo.Service
                 // Add more cases as needed
                 default: return clrType;
             }
+        }
+
+        public async Task InstallPackageAsync(ProjectResponseModel projectResponseModel, string projectType)
+        {
+            string newItemGroup = @"
+            <ItemGroup>
+              <PackageReference Include=""Microsoft.EntityFrameworkCore"" Version=""8.0.8"" />
+              <PackageReference Include=""Microsoft.EntityFrameworkCore.SqlServer"" Version=""8.0.8"" />
+              <PackageReference Include=""Microsoft.EntityFrameworkCore.Tools"" Version=""8.0.8"">
+                <PrivateAssets>all</PrivateAssets>
+                <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+              </PackageReference>
+            </ItemGroup>";
+
+            string newPackageReference = @"
+            <PackageReference Include=""Moq"" Version=""4.20.72"" />";
+            string projectFilePath=string.Empty;
+            if (projectType== "DataAccess.Contracts")
+            {
+                projectFilePath = Path.Combine(projectResponseModel.DataAccessContractPath, $"Msc.{projectResponseModel.ProjectName}.Service.{projectType}.csproj");
+            }
+            else if (projectType == "Api.Test")
+            {
+                projectFilePath = Path.Combine(projectResponseModel.APITestPath, $"Msc.{projectResponseModel.ProjectName}.Service.{projectType}.csproj");
+            }
+            else if (projectType == "Business.Test")
+            {
+                projectFilePath = Path.Combine(projectResponseModel.BusinessTestPath, $"Msc.{projectResponseModel.ProjectName}.Service.{projectType}.csproj");
+            }
+
+            XDocument doc = XDocument.Load(projectFilePath);
+
+            if (projectType == "DataAccess.Contracts")
+            {
+                XElement newElement = XElement.Parse(newItemGroup);
+
+                // Find the existing ItemGroup element to replace
+                XElement existingItemGroup = doc.Root.Element("ItemGroup");
+
+                if (existingItemGroup != null)
+                {
+                    existingItemGroup.AddBeforeSelf(newElement);
+                }
+                else
+                {
+                    // If no ItemGroup exists, add the new one
+                    doc.Root.Add(newElement);
+                }
+            }
+            else
+            {
+                XElement newElement = XElement.Parse(newPackageReference);
+
+                // Find the first ItemGroup element that contains PackageReference elements
+                XElement firstItemGroup = doc.Root.Elements("ItemGroup")
+                                                  .FirstOrDefault(ig => ig.Elements("PackageReference").Any());
+
+                if (firstItemGroup != null)
+                {
+                    // Add the new PackageReference to the first ItemGroup
+                    firstItemGroup.Add(newElement);
+                }
+                else
+                {
+                    // If no ItemGroup with PackageReference exists, create a new one
+                    XElement newItemGroupElement = new XElement("ItemGroup", newElement);
+                    doc.Root.Add(newItemGroupElement);
+                }
+            }
+
+            doc.Save(projectFilePath);
+            Console.WriteLine($"New ItemGroup or PackageReference added successfully to {projectType}.");
         }
 
         private async Task ExecuteDotnetCommandAsync(string command, string workingDirectory)

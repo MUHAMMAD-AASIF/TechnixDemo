@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using TechnixDemo.Model;
 using TechnixDemo.Service;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace TechnixDemo.Forms
 {
@@ -18,13 +10,13 @@ namespace TechnixDemo.Forms
         private List<EntitySelectModel> _entities;
         private CodeG _parentForm;
         private BindingList<EntitySelectModel> _bindingList;
-        private readonly ProjectResponseModel _filepathRes;
+        private readonly ProjectResponseModel _filePathRes;
 
-        public EntityData(ProjectResponseModel filepathRes, CodeG parentForm)
+        public EntityData(ProjectResponseModel filePathRes, CodeG parentForm)
         {
 
             InitializeComponent();
-            _filepathRes=filepathRes;
+            _filePathRes=filePathRes;
             _parentForm = parentForm;
             _entities = new List<EntitySelectModel>();
 
@@ -109,9 +101,8 @@ namespace TechnixDemo.Forms
         private void Generate_Click(object sender, EventArgs e)
         {
             var selectedModels = _bindingList.Where(x=>x.Select && (x.GetAll || x.GetById || x.Save || x.Update || x.Delete)).ToList();
-            var Filepath = _filepathRes;
-            FileGenerateService fileGenerateService = new FileGenerateService(selectedModels, Filepath);
-            fileGenerateService.GenerateFile();
+            FileGenerateService fileGenerateService = new FileGenerateService(selectedModels, _filePathRes);
+            fileGenerateService.ProcessFileGeneration();
             MessageBox.Show("Files Created Sucessfully");
         }
     }
