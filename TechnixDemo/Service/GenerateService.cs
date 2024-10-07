@@ -92,7 +92,6 @@ namespace TechnixDemo.Service
                 UpdateDataGridView("Add Projects to Solution", "Completed");
                 UpdateProgress(60);
 
-                // Create Project Folders (for Web API Project)
                 UpdateDataGridView("Create Project Folders", "Started");
                 responseModel.APIPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Api");
                 responseModel.BusinessPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business");
@@ -102,14 +101,18 @@ namespace TechnixDemo.Service
                 responseModel.DataAccessContractPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.DataAccess.Contracts");
                 responseModel.APITestPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.API.Test");
                 responseModel.BusinessTestPath = Path.Combine(solutionDirectory, $"Msc.{projectName}.Service.Business.Test");
+                responseModel.ProjectName = projectName;
                 UpdateDataGridView("Create Project Folders", "Completed");
                 UpdateProgress(70);
 
-                // Add References Between Projects
                 await AddReferencesBetweenProjects(solutionDirectory, projectName);
                 UpdateProgress(80);
 
-                // Open Solution
+                await InstallPackageAsync(responseModel, "DataAccess.Contracts");
+                await InstallPackageAsync(responseModel, "Api.Test");
+                await InstallPackageAsync(responseModel, "Business.Test");
+                UpdateProgress(90);
+
                 UpdateDataGridView("Open Solution", "Started");
                 OpenSolutionFile(solutionDirectory, $"Msc.{solutionName}.Service");
                 UpdateDataGridView("Open Solution", "Completed");
@@ -125,6 +128,7 @@ namespace TechnixDemo.Service
 
             return responseModel;
         }
+
 
         #region Adding Reference between all Projects 
 
@@ -243,8 +247,8 @@ namespace TechnixDemo.Service
               </PackageReference>
             </ItemGroup>";
 
-            string newPackageReference = @"
-            <PackageReference Include=""Moq"" Version=""4.20.72"" />";
+            string newPackageReference = @"<PackageReference Include=""Moq"" Version=""4.20.72"" />";
+
             string projectFilePath=string.Empty;
             if (projectType== "DataAccess.Contracts")
             {

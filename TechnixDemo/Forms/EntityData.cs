@@ -16,7 +16,7 @@ namespace TechnixDemo.Forms
         {
 
             InitializeComponent();
-            _filePathRes=filePathRes;
+            _filePathRes = filePathRes;
             _parentForm = parentForm;
             _entities = new List<EntitySelectModel>();
 
@@ -100,7 +100,7 @@ namespace TechnixDemo.Forms
 
         private void Generate_Click(object sender, EventArgs e)
         {
-            var selectedModels = _bindingList.Where(x=>x.Select && (x.GetAll || x.GetById || x.Save || x.Update || x.Delete)).ToList();
+            var selectedModels = _bindingList.Where(x => x.Select && (x.GetAll || x.GetById || x.Save || x.Update || x.Delete)).ToList();
             FileGenerateService fileGenerateService = new FileGenerateService(selectedModels, _filePathRes);
             fileGenerateService.ProcessFileGeneration();
             MessageBox.Show("Files Created Sucessfully");

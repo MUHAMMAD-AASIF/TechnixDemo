@@ -1,6 +1,7 @@
 using TechnixDemo.Service;
 using TechnixDemo.Model;
 using TechnixDemo.Forms;
+using System.ComponentModel.DataAnnotations;
 
 namespace TechnixDemo
 {
@@ -35,19 +36,22 @@ namespace TechnixDemo
         private void NewProject_Click(object sender, EventArgs e)
         {
             this.NewPanel.Visible = true;
-            this.NewProject.BackColor = Color.Khaki;
             this.FrontPanel.Visible = true;
             this.ExistingPanel.Visible = false;
-            this.ExistingProject.BackColor = Color.White;
+
+            this.NewProject.BackColor = Color.White;
+            this.ExistingProject.BackColor = Color.Khaki;
         }
 
         private void ExistingProject_Click(object sender, EventArgs e)
         {
             this.FrontPanel.Visible = false;
             this.NewPanel.Visible = true;
-            this.NewProject.BackColor = Color.White;
             this.ExistingPanel.Visible = false;
-            this.ExistingProject.BackColor = Color.Khaki;
+
+            this.NewProject.BackColor = Color.Khaki;
+            this.ExistingProject.BackColor = Color.White;
+
         }
 
         private void folderpathbtn_Click(object sender, EventArgs e)
@@ -57,8 +61,8 @@ namespace TechnixDemo
 
         private async void GenProcBtn_Click(object sender, EventArgs e)
         {
-            // Hide and show necessary panels
             TogglePanels(isProcessing: true);
+            string A = ServerName;
 
             // Retrieve input values
             string solutionName = SolNmTxt.Text.Trim();
@@ -111,17 +115,24 @@ namespace TechnixDemo
         }
         private void runEntity_Click(object sender, EventArgs e)
         {
-            var validate = ValidatePaths(projectResponseModel);
-            if (validate.IsValid)
+            string AppContextPath = Path.Combine(projectResponseModel.DataAccessContractPath, "Context", $"AppDbContext.cs");
+            if (File.Exists(AppContextPath))
             {
-                EntityData entityData = new EntityData(projectResponseModel, this);
-                entityData.Show();
+                var validate = ValidatePaths(projectResponseModel);
+                if (validate.IsValid)
+                {
+                    EntityData entityData = new EntityData(projectResponseModel, this);
+                    entityData.Show();
+                }
+                else
+                {
+                    MessageBox.Show(validate.Message);
+                }
             }
             else
             {
-                MessageBox.Show(validate.Message);
+                MessageBox.Show("Run the Scaffold");
             }
-
         }
 
         private static ValidatePathModel ValidatePaths(ProjectResponseModel projectResponseModel)
@@ -297,13 +308,16 @@ namespace TechnixDemo
             SelectFolder(SolutionPath);
         }
 
-        private async void InsPacBtn_Click(object sender, EventArgs e)
+        private void Config_Click(object sender, EventArgs e)
         {
-            
-            GenerateService generateService = new GenerateService(StatusGrid, ProcessProgress);
-            await generateService.InstallPackageAsync(projectResponseModel, "DataAccess.Contracts");
-            await generateService.InstallPackageAsync(projectResponseModel, "Api.Test");
-            await generateService.InstallPackageAsync(projectResponseModel, "Business.Test");
+            DBConfig dbConfig = new DBConfig();
+
+            if (dbConfig.ShowDialog() == DialogResult.OK)
+            {
+                string dataFromForm2 = dbConfig.FormData;
+                DbConTxt.Text = dataFromForm2;
+            }
+
         }
     }
 }
