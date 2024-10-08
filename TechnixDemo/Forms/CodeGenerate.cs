@@ -40,7 +40,7 @@ namespace TechnixDemo
             this.ExistingPanel.Visible = false;
 
             this.NewProject.BackColor = Color.White;
-            this.ExistingProject.BackColor = Color.Khaki;
+            this.ExistingProject.BackColor = Color.FromArgb(238, 212, 132);
         }
 
         private void ExistingProject_Click(object sender, EventArgs e)
@@ -49,7 +49,7 @@ namespace TechnixDemo
             this.NewPanel.Visible = true;
             this.ExistingPanel.Visible = false;
 
-            this.NewProject.BackColor = Color.Khaki;
+            this.NewProject.BackColor = Color.FromArgb(238, 212, 132);
             this.ExistingProject.BackColor = Color.White;
 
         }
@@ -61,30 +61,49 @@ namespace TechnixDemo
 
         private async void GenProcBtn_Click(object sender, EventArgs e)
         {
-            TogglePanels(isProcessing: true);
-            string A = ServerName;
-
-            // Retrieve input values
-            string solutionName = SolNmTxt.Text.Trim();
-            string projectName = ProcNmTxt.Text.Trim();
-            string projectPath = folderpathTxt.Text.Trim();
-
-            // Initialize the service and generate the project
-            GenerateService generateService = new GenerateService(StatusGrid, ProcessProgress);
-            var result = await generateService.GenerateAPIProjectAsync(solutionName, projectName, projectPath);
-
-            // Update project response model
-            UpdateProjectResponseModel(result, projectName, solutionName);
-
-            // If generation was successful, update UI and notify the user
-            if (result.Status)
+            if (SolNmTxt.Text == string.Empty)
             {
-                UpdatePaths(result);
-                TogglePanels(isProcessing: false);
-
-                ExistingProject_Click(sender, e);
-                MessageBox.Show("Project Created Successfully");
+                MessageBox.Show("Solution Name is Mandatory");
             }
+            else if (ProcNmTxt.Text == string.Empty)
+            {
+                MessageBox.Show("Project Name is Mandatory");
+            }
+            else if (folderpathTxt.Text == string.Empty)
+            {
+                MessageBox.Show("Directory Path is Mandatory");
+            }
+            else if (DbConTxt.Text == string.Empty)
+            {
+                MessageBox.Show("Connection String is Mandatory");
+            }
+            else
+            {
+                TogglePanels(isProcessing: true);
+
+                // Retrieve input values
+                string solutionName = SolNmTxt.Text.Trim();
+                string projectName = ProcNmTxt.Text.Trim();
+                string projectPath = folderpathTxt.Text.Trim();
+
+                // Initialize the service and generate the project
+                GenerateService generateService = new GenerateService(StatusGrid, ProcessProgress);
+                var result = await generateService.GenerateAPIProjectAsync(solutionName, projectName, projectPath);
+
+                // Update project response model
+                UpdateProjectResponseModel(result, projectName, solutionName);
+
+                // If generation was successful, update UI and notify the user
+                if (result.Status)
+                {
+                    UpdatePaths(result);
+                    TogglePanels(isProcessing: false);
+
+                    ExistingProject_Click(sender, e);
+                    MessageBox.Show("Project Created Successfully");
+                }
+            }
+
         }
 
         private void TogglePanels(bool isProcessing)
@@ -121,8 +140,16 @@ namespace TechnixDemo
                 var validate = ValidatePaths(projectResponseModel);
                 if (validate.IsValid)
                 {
-                    EntityData entityData = new EntityData(projectResponseModel, this);
-                    entityData.Show();
+                    if (DbConTxt.Text == string.Empty)
+                    {
+                        MessageBox.Show("Connection String is Mandatory");
+                    }
+                    else
+                    {
+                        projectResponseModel.DbConfig = DbConTxt.Text;
+                        EntityData entityData = new EntityData(projectResponseModel, this);
+                        entityData.Show();
+                    }
                 }
                 else
                 {

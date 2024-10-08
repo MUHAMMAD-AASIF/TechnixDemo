@@ -7,9 +7,9 @@ namespace TechnixDemo.Service
     {
         private readonly string _connectionString;
 
-        public DatabaseHelper()
+        public DatabaseHelper(string connectionString)
         {
-            _connectionString = Program.Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
+            _connectionString = connectionString;
         }
         public List<string> GetTableNames()
         {

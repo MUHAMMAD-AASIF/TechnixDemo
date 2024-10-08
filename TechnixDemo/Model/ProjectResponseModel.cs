@@ -21,6 +21,6 @@ namespace TechnixDemo.Model
         public string APITestPath { get; set; } = string.Empty;
         public string BusinessTestPath { get; set; } = string.Empty;
         public bool Status {  get; set; } = false;
-
+        public string DbConfig { get; set;} = string.Empty; 
     }
 }

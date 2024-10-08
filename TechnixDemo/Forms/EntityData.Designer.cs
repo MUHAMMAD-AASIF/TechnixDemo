@@ -40,7 +40,7 @@
             // 
             // panel1
             // 
-            panel1.BackColor = Color.Khaki;
+            panel1.BackColor = Color.FromArgb(238, 212, 132);
             panel1.Controls.Add(Close);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);

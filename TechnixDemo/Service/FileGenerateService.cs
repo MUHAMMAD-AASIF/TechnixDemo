@@ -245,7 +245,7 @@ namespace TechnixDemo.Service
                 { "Controller", () => new ApiGenerator().GenerateController(entity, _filePathRes.ProjectName) },
                 { "Business", () => new BusinessGenerator().GenerateBusiness(entity, _filePathRes.ProjectName) },
                 { "Business.Contracts", () => new BusinessContractGenerator().GenerateBusinessContract(entity, _filePathRes.ProjectName) },
-                { "DataAccess", () => new DataAccessGenerator().GenerateDataAccess(entity, _filePathRes.ProjectName) },
+                { "DataAccess", () => new DataAccessGenerator().GenerateDataAccess(entity, _filePathRes.ProjectName,_filePathRes.DbConfig) },
                 { "DataAccess.Contracts", () => new DataAccessContractGenerator().GenerateDataAccessContract(entity, _filePathRes.ProjectName) },
                 { "API.Test", () => new ApiTestGenerator().GenerateApiTest(entity, _filePathRes.ProjectName) },
                 { "Business.Test", () => new BusinessTestGenerator().GenerateBusinessTests(entity, _filePathRes.ProjectName) }

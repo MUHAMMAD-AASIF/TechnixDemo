@@ -28,11 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CodeG));
             mainframe = new Panel();
-            panel2 = new Panel();
-            panel4 = new Panel();
-            Close = new Button();
             pictureBox1 = new PictureBox();
             NewProject = new Button();
             panel3 = new Panel();
@@ -82,7 +78,7 @@
             label5 = new Label();
             APIPathTxt = new TextBox();
             NextBtn = new Button();
-            InsPacBtn = new Button();
+            ConfigBtn = new Button();
             ExistingPanel = new Panel();
             ProcessProgress = new ProgressBar();
             StatusGrid = new DataGridView();
@@ -92,8 +88,6 @@
             ConStrTxt = new Label();
             fontDialog1 = new FontDialog();
             mainframe.SuspendLayout();
-            panel2.SuspendLayout();
-            panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             panel3.SuspendLayout();
             panel1.SuspendLayout();
@@ -106,55 +100,20 @@
             // 
             // mainframe
             // 
-            mainframe.BackColor = Color.Khaki;
-            mainframe.Controls.Add(panel2);
+            mainframe.BackColor = Color.FromArgb(238, 212, 132);
             mainframe.Controls.Add(pictureBox1);
             mainframe.Dock = DockStyle.Top;
             mainframe.Location = new Point(0, 0);
             mainframe.Name = "mainframe";
-            mainframe.Size = new Size(681, 92);
+            mainframe.Size = new Size(681, 62);
             mainframe.TabIndex = 3;
-            // 
-            // panel2
-            // 
-            panel2.BackColor = Color.Khaki;
-            panel2.Controls.Add(panel4);
-            panel2.Dock = DockStyle.Right;
-            panel2.Location = new Point(420, 0);
-            panel2.Name = "panel2";
-            panel2.Size = new Size(261, 92);
-            panel2.TabIndex = 4;
-            // 
-            // panel4
-            // 
-            panel4.BackColor = Color.Khaki;
-            panel4.Controls.Add(Close);
-            panel4.Dock = DockStyle.Top;
-            panel4.Location = new Point(0, 0);
-            panel4.Name = "panel4";
-            panel4.Size = new Size(261, 24);
-            panel4.TabIndex = 0;
-            // 
-            // Close
-            // 
-            Close.BackgroundImage = (Image)resources.GetObject("Close.BackgroundImage");
-            Close.BackgroundImageLayout = ImageLayout.Stretch;
-            Close.Dock = DockStyle.Right;
-            Close.FlatAppearance.BorderSize = 0;
-            Close.FlatStyle = FlatStyle.Flat;
-            Close.Location = new Point(237, 0);
-            Close.Name = "Close";
-            Close.Size = new Size(24, 24);
-            Close.TabIndex = 3;
-            Close.UseVisualStyleBackColor = true;
-            Close.Click += Close_Click;
             // 
             // pictureBox1
             // 
-            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(3, 4);
+            pictureBox1.Image = Properties.Resources.logo_removebg_preview;
+            pictureBox1.Location = new Point(9, 9);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(367, 83);
+            pictureBox1.Size = new Size(47, 42);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 2;
             pictureBox1.TabStop = false;
@@ -164,7 +123,7 @@
             NewProject.BackColor = Color.White;
             NewProject.Dock = DockStyle.Left;
             NewProject.FlatAppearance.BorderSize = 0;
-            NewProject.FlatAppearance.MouseDownBackColor = Color.Khaki;
+            NewProject.FlatAppearance.MouseDownBackColor = Color.FromArgb(238, 212, 132);
             NewProject.FlatAppearance.MouseOverBackColor = Color.White;
             NewProject.FlatStyle = FlatStyle.Flat;
             NewProject.Font = new Font("Sans Serif Collection", 10F, FontStyle.Regular, GraphicsUnit.Pixel);
@@ -181,17 +140,17 @@
             panel3.Controls.Add(ExistingProject);
             panel3.Controls.Add(NewProject);
             panel3.Dock = DockStyle.Top;
-            panel3.Location = new Point(0, 92);
+            panel3.Location = new Point(0, 62);
             panel3.Name = "panel3";
             panel3.Size = new Size(681, 29);
             panel3.TabIndex = 8;
             // 
             // ExistingProject
             // 
-            ExistingProject.BackColor = Color.Khaki;
+            ExistingProject.BackColor = Color.FromArgb(238, 212, 132);
             ExistingProject.Dock = DockStyle.Right;
             ExistingProject.FlatAppearance.BorderSize = 0;
-            ExistingProject.FlatAppearance.MouseDownBackColor = Color.Khaki;
+            ExistingProject.FlatAppearance.MouseDownBackColor = Color.FromArgb(238, 212, 132);
             ExistingProject.FlatAppearance.MouseOverBackColor = Color.White;
             ExistingProject.FlatStyle = FlatStyle.Flat;
             ExistingProject.Font = new Font("Sans Serif Collection", 10F, FontStyle.Regular, GraphicsUnit.Pixel);
@@ -208,9 +167,9 @@
             panel1.BackColor = Color.White;
             panel1.Controls.Add(panel6);
             panel1.Dock = DockStyle.Top;
-            panel1.Location = new Point(0, 121);
+            panel1.Location = new Point(0, 91);
             panel1.Name = "panel1";
-            panel1.Size = new Size(681, 412);
+            panel1.Size = new Size(681, 414);
             panel1.TabIndex = 30;
             // 
             // panel6
@@ -220,7 +179,7 @@
             panel6.Dock = DockStyle.Top;
             panel6.Location = new Point(0, 0);
             panel6.Name = "panel6";
-            panel6.Size = new Size(681, 412);
+            panel6.Size = new Size(681, 414);
             panel6.TabIndex = 32;
             // 
             // NewPanel
@@ -257,11 +216,11 @@
             NewPanel.Controls.Add(label5);
             NewPanel.Controls.Add(APIPathTxt);
             NewPanel.Controls.Add(NextBtn);
-            NewPanel.Controls.Add(InsPacBtn);
+            NewPanel.Controls.Add(ConfigBtn);
             NewPanel.Dock = DockStyle.Left;
             NewPanel.Location = new Point(0, 0);
             NewPanel.Name = "NewPanel";
-            NewPanel.Size = new Size(672, 412);
+            NewPanel.Size = new Size(669, 414);
             NewPanel.TabIndex = 33;
             // 
             // FrontPanel
@@ -280,14 +239,14 @@
             FrontPanel.Dock = DockStyle.Left;
             FrontPanel.Location = new Point(0, 0);
             FrontPanel.Name = "FrontPanel";
-            FrontPanel.Size = new Size(669, 412);
+            FrontPanel.Size = new Size(666, 414);
             FrontPanel.TabIndex = 74;
             // 
             // DbConTxt
             // 
             DbConTxt.BackColor = Color.White;
             DbConTxt.BorderStyle = BorderStyle.FixedSingle;
-            DbConTxt.Location = new Point(37, 214);
+            DbConTxt.Location = new Point(37, 211);
             DbConTxt.Name = "DbConTxt";
             DbConTxt.Size = new Size(579, 23);
             DbConTxt.TabIndex = 36;
@@ -297,13 +256,13 @@
             Config.BackColor = SystemColors.ActiveCaptionText;
             Config.FlatAppearance.BorderSize = 0;
             Config.FlatStyle = FlatStyle.Flat;
-            Config.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            Config.Font = new Font("Sans Serif Collection", 4F, FontStyle.Bold, GraphicsUnit.Point);
             Config.ForeColor = Color.White;
-            Config.Location = new Point(37, 249);
+            Config.Location = new Point(444, 249);
             Config.Name = "Config";
             Config.Size = new Size(81, 23);
             Config.TabIndex = 34;
-            Config.Text = "Config";
+            Config.Text = "Db Config";
             Config.UseVisualStyleBackColor = false;
             Config.Click += Config_Click;
             // 
@@ -320,7 +279,7 @@
             // 
             ProcNmTxt.BackColor = Color.White;
             ProcNmTxt.BorderStyle = BorderStyle.FixedSingle;
-            ProcNmTxt.Location = new Point(35, 98);
+            ProcNmTxt.Location = new Point(35, 97);
             ProcNmTxt.Name = "ProcNmTxt";
             ProcNmTxt.Size = new Size(579, 23);
             ProcNmTxt.TabIndex = 31;
@@ -330,7 +289,7 @@
             GenProcBtn.BackColor = SystemColors.ActiveCaptionText;
             GenProcBtn.FlatAppearance.BorderSize = 0;
             GenProcBtn.FlatStyle = FlatStyle.Flat;
-            GenProcBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            GenProcBtn.Font = new Font("Sans Serif Collection", 4F, FontStyle.Bold, GraphicsUnit.Point);
             GenProcBtn.ForeColor = Color.White;
             GenProcBtn.Location = new Point(533, 249);
             GenProcBtn.Name = "GenProcBtn";
@@ -347,7 +306,7 @@
             folderpathbtn.FlatStyle = FlatStyle.Flat;
             folderpathbtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             folderpathbtn.ForeColor = Color.White;
-            folderpathbtn.Location = new Point(579, 155);
+            folderpathbtn.Location = new Point(578, 154);
             folderpathbtn.Name = "folderpathbtn";
             folderpathbtn.Size = new Size(35, 23);
             folderpathbtn.TabIndex = 29;
@@ -359,7 +318,7 @@
             // 
             folderpathTxt.BackColor = Color.White;
             folderpathTxt.BorderStyle = BorderStyle.FixedSingle;
-            folderpathTxt.Location = new Point(35, 156);
+            folderpathTxt.Location = new Point(35, 154);
             folderpathTxt.Name = "folderpathTxt";
             folderpathTxt.ReadOnly = true;
             folderpathTxt.Size = new Size(543, 23);
@@ -370,7 +329,7 @@
             label13.AutoSize = true;
             label13.FlatStyle = FlatStyle.Flat;
             label13.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label13.Location = new Point(40, 197);
+            label13.Location = new Point(40, 194);
             label13.Name = "label13";
             label13.Size = new Size(76, 15);
             label13.TabIndex = 35;
@@ -414,7 +373,7 @@
             GetPathBtn.BackColor = SystemColors.ActiveCaptionText;
             GetPathBtn.FlatAppearance.BorderSize = 0;
             GetPathBtn.FlatStyle = FlatStyle.Flat;
-            GetPathBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            GetPathBtn.Font = new Font("Sans Serif Collection", 4F, FontStyle.Bold, GraphicsUnit.Point);
             GetPathBtn.ForeColor = Color.White;
             GetPathBtn.Location = new Point(566, 83);
             GetPathBtn.Name = "GetPathBtn";
@@ -466,7 +425,7 @@
             SelBusinessTstFPBtn.FlatStyle = FlatStyle.Flat;
             SelBusinessTstFPBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             SelBusinessTstFPBtn.ForeColor = Color.White;
-            SelBusinessTstFPBtn.Location = new Point(605, 290);
+            SelBusinessTstFPBtn.Location = new Point(605, 273);
             SelBusinessTstFPBtn.Name = "SelBusinessTstFPBtn";
             SelBusinessTstFPBtn.Size = new Size(35, 23);
             SelBusinessTstFPBtn.TabIndex = 69;
@@ -479,7 +438,7 @@
             label10.AutoSize = true;
             label10.FlatStyle = FlatStyle.Flat;
             label10.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label10.Location = new Point(359, 275);
+            label10.Location = new Point(359, 258);
             label10.Name = "label10";
             label10.Size = new Size(125, 15);
             label10.TabIndex = 67;
@@ -489,7 +448,7 @@
             // 
             BusinessTestPathTxt.BackColor = Color.White;
             BusinessTestPathTxt.BorderStyle = BorderStyle.FixedSingle;
-            BusinessTestPathTxt.Location = new Point(359, 290);
+            BusinessTestPathTxt.Location = new Point(359, 273);
             BusinessTestPathTxt.Name = "BusinessTestPathTxt";
             BusinessTestPathTxt.Size = new Size(246, 23);
             BusinessTestPathTxt.TabIndex = 68;
@@ -501,7 +460,7 @@
             SelApiTestFPBtn.FlatStyle = FlatStyle.Flat;
             SelApiTestFPBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             SelApiTestFPBtn.ForeColor = Color.White;
-            SelApiTestFPBtn.Location = new Point(299, 290);
+            SelApiTestFPBtn.Location = new Point(299, 273);
             SelApiTestFPBtn.Name = "SelApiTestFPBtn";
             SelApiTestFPBtn.Size = new Size(35, 23);
             SelApiTestFPBtn.TabIndex = 66;
@@ -514,7 +473,7 @@
             label11.AutoSize = true;
             label11.FlatStyle = FlatStyle.Flat;
             label11.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label11.Location = new Point(54, 275);
+            label11.Location = new Point(54, 258);
             label11.Name = "label11";
             label11.Size = new Size(100, 15);
             label11.TabIndex = 64;
@@ -524,7 +483,7 @@
             // 
             APITestPathTxt.BackColor = Color.White;
             APITestPathTxt.BorderStyle = BorderStyle.FixedSingle;
-            APITestPathTxt.Location = new Point(54, 290);
+            APITestPathTxt.Location = new Point(54, 273);
             APITestPathTxt.Name = "APITestPathTxt";
             APITestPathTxt.Size = new Size(246, 23);
             APITestPathTxt.TabIndex = 65;
@@ -536,7 +495,7 @@
             SelDaCFPBtn.FlatStyle = FlatStyle.Flat;
             SelDaCFPBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             SelDaCFPBtn.ForeColor = Color.White;
-            SelDaCFPBtn.Location = new Point(605, 238);
+            SelDaCFPBtn.Location = new Point(605, 221);
             SelDaCFPBtn.Name = "SelDaCFPBtn";
             SelDaCFPBtn.Size = new Size(35, 23);
             SelDaCFPBtn.TabIndex = 62;
@@ -549,7 +508,7 @@
             label8.AutoSize = true;
             label8.FlatStyle = FlatStyle.Flat;
             label8.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label8.Location = new Point(359, 223);
+            label8.Location = new Point(359, 206);
             label8.Name = "label8";
             label8.Size = new Size(166, 15);
             label8.TabIndex = 60;
@@ -559,7 +518,7 @@
             // 
             DataContractPathTxt.BackColor = Color.White;
             DataContractPathTxt.BorderStyle = BorderStyle.FixedSingle;
-            DataContractPathTxt.Location = new Point(359, 238);
+            DataContractPathTxt.Location = new Point(359, 221);
             DataContractPathTxt.Name = "DataContractPathTxt";
             DataContractPathTxt.Size = new Size(246, 23);
             DataContractPathTxt.TabIndex = 61;
@@ -571,7 +530,7 @@
             SelDAFPBtn.FlatStyle = FlatStyle.Flat;
             SelDAFPBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             SelDAFPBtn.ForeColor = Color.White;
-            SelDAFPBtn.Location = new Point(299, 238);
+            SelDAFPBtn.Location = new Point(299, 221);
             SelDAFPBtn.Name = "SelDAFPBtn";
             SelDAFPBtn.Size = new Size(35, 23);
             SelDAFPBtn.TabIndex = 59;
@@ -584,7 +543,7 @@
             label9.AutoSize = true;
             label9.FlatStyle = FlatStyle.Flat;
             label9.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label9.Location = new Point(54, 223);
+            label9.Location = new Point(54, 206);
             label9.Name = "label9";
             label9.Size = new Size(120, 15);
             label9.TabIndex = 57;
@@ -594,7 +553,7 @@
             // 
             DataAccessPathTxt.BackColor = Color.White;
             DataAccessPathTxt.BorderStyle = BorderStyle.FixedSingle;
-            DataAccessPathTxt.Location = new Point(54, 238);
+            DataAccessPathTxt.Location = new Point(54, 221);
             DataAccessPathTxt.Name = "DataAccessPathTxt";
             DataAccessPathTxt.Size = new Size(246, 23);
             DataAccessPathTxt.TabIndex = 58;
@@ -606,7 +565,7 @@
             SelCommonMdFPBtn.FlatStyle = FlatStyle.Flat;
             SelCommonMdFPBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             SelCommonMdFPBtn.ForeColor = Color.White;
-            SelCommonMdFPBtn.Location = new Point(604, 192);
+            SelCommonMdFPBtn.Location = new Point(604, 175);
             SelCommonMdFPBtn.Name = "SelCommonMdFPBtn";
             SelCommonMdFPBtn.Size = new Size(35, 23);
             SelCommonMdFPBtn.TabIndex = 56;
@@ -619,7 +578,7 @@
             label3.AutoSize = true;
             label3.FlatStyle = FlatStyle.Flat;
             label3.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label3.Location = new Point(359, 177);
+            label3.Location = new Point(359, 160);
             label3.Name = "label3";
             label3.Size = new Size(134, 15);
             label3.TabIndex = 54;
@@ -629,7 +588,7 @@
             // 
             CommonModelPathTxt.BackColor = Color.White;
             CommonModelPathTxt.BorderStyle = BorderStyle.FixedSingle;
-            CommonModelPathTxt.Location = new Point(359, 192);
+            CommonModelPathTxt.Location = new Point(359, 175);
             CommonModelPathTxt.Name = "CommonModelPathTxt";
             CommonModelPathTxt.Size = new Size(246, 23);
             CommonModelPathTxt.TabIndex = 55;
@@ -639,9 +598,9 @@
             runEntity.BackColor = SystemColors.ActiveCaptionText;
             runEntity.FlatAppearance.BorderSize = 0;
             runEntity.FlatStyle = FlatStyle.Flat;
-            runEntity.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            runEntity.Font = new Font("Sans Serif Collection", 4F, FontStyle.Bold, GraphicsUnit.Point);
             runEntity.ForeColor = Color.White;
-            runEntity.Location = new Point(562, 337);
+            runEntity.Location = new Point(562, 320);
             runEntity.Name = "runEntity";
             runEntity.Size = new Size(76, 23);
             runEntity.TabIndex = 53;
@@ -656,7 +615,7 @@
             SelBusinessCnFPBtn.FlatStyle = FlatStyle.Flat;
             SelBusinessCnFPBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             SelBusinessCnFPBtn.ForeColor = Color.White;
-            SelBusinessCnFPBtn.Location = new Point(299, 192);
+            SelBusinessCnFPBtn.Location = new Point(299, 175);
             SelBusinessCnFPBtn.Name = "SelBusinessCnFPBtn";
             SelBusinessCnFPBtn.Size = new Size(35, 23);
             SelBusinessCnFPBtn.TabIndex = 52;
@@ -669,7 +628,7 @@
             label7.AutoSize = true;
             label7.FlatStyle = FlatStyle.Flat;
             label7.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label7.Location = new Point(54, 177);
+            label7.Location = new Point(54, 160);
             label7.Name = "label7";
             label7.Size = new Size(150, 15);
             label7.TabIndex = 50;
@@ -679,7 +638,7 @@
             // 
             BusinessContractPathTxt.BackColor = Color.White;
             BusinessContractPathTxt.BorderStyle = BorderStyle.FixedSingle;
-            BusinessContractPathTxt.Location = new Point(54, 192);
+            BusinessContractPathTxt.Location = new Point(54, 175);
             BusinessContractPathTxt.Name = "BusinessContractPathTxt";
             BusinessContractPathTxt.Size = new Size(246, 23);
             BusinessContractPathTxt.TabIndex = 51;
@@ -691,7 +650,7 @@
             SelBusinessFPBtn.FlatStyle = FlatStyle.Flat;
             SelBusinessFPBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             SelBusinessFPBtn.ForeColor = Color.White;
-            SelBusinessFPBtn.Location = new Point(603, 147);
+            SelBusinessFPBtn.Location = new Point(603, 130);
             SelBusinessFPBtn.Name = "SelBusinessFPBtn";
             SelBusinessFPBtn.Size = new Size(35, 23);
             SelBusinessFPBtn.TabIndex = 49;
@@ -704,7 +663,7 @@
             label6.AutoSize = true;
             label6.FlatStyle = FlatStyle.Flat;
             label6.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label6.Location = new Point(359, 132);
+            label6.Location = new Point(359, 115);
             label6.Name = "label6";
             label6.Size = new Size(104, 15);
             label6.TabIndex = 47;
@@ -714,7 +673,7 @@
             // 
             BusinessPathTxt.BackColor = Color.White;
             BusinessPathTxt.BorderStyle = BorderStyle.FixedSingle;
-            BusinessPathTxt.Location = new Point(359, 147);
+            BusinessPathTxt.Location = new Point(359, 130);
             BusinessPathTxt.Name = "BusinessPathTxt";
             BusinessPathTxt.Size = new Size(246, 23);
             BusinessPathTxt.TabIndex = 48;
@@ -726,7 +685,7 @@
             SelApiFPBtn.FlatStyle = FlatStyle.Flat;
             SelApiFPBtn.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             SelApiFPBtn.ForeColor = Color.White;
-            SelApiFPBtn.Location = new Point(299, 146);
+            SelApiFPBtn.Location = new Point(299, 129);
             SelApiFPBtn.Name = "SelApiFPBtn";
             SelApiFPBtn.Size = new Size(35, 23);
             SelApiFPBtn.TabIndex = 46;
@@ -739,7 +698,7 @@
             label5.AutoSize = true;
             label5.FlatStyle = FlatStyle.Flat;
             label5.Font = new Font("Sans Serif Collection", 4F, FontStyle.Regular, GraphicsUnit.Point);
-            label5.Location = new Point(54, 131);
+            label5.Location = new Point(54, 114);
             label5.Name = "label5";
             label5.Size = new Size(79, 15);
             label5.TabIndex = 44;
@@ -749,7 +708,7 @@
             // 
             APIPathTxt.BackColor = Color.White;
             APIPathTxt.BorderStyle = BorderStyle.FixedSingle;
-            APIPathTxt.Location = new Point(54, 146);
+            APIPathTxt.Location = new Point(54, 129);
             APIPathTxt.Name = "APIPathTxt";
             APIPathTxt.Size = new Size(246, 23);
             APIPathTxt.TabIndex = 45;
@@ -769,12 +728,20 @@
             NextBtn.UseVisualStyleBackColor = false;
             NextBtn.Visible = false;
             // 
-            // InsPacBtn
+            // ConfigBtn
             // 
-            InsPacBtn.Location = new Point(0, 0);
-            InsPacBtn.Name = "InsPacBtn";
-            InsPacBtn.Size = new Size(75, 23);
-            InsPacBtn.TabIndex = 75;
+            ConfigBtn.BackColor = SystemColors.ActiveCaptionText;
+            ConfigBtn.FlatAppearance.BorderSize = 0;
+            ConfigBtn.FlatStyle = FlatStyle.Flat;
+            ConfigBtn.Font = new Font("Sans Serif Collection", 4F, FontStyle.Bold, GraphicsUnit.Point);
+            ConfigBtn.ForeColor = Color.White;
+            ConfigBtn.Location = new Point(475, 320);
+            ConfigBtn.Name = "ConfigBtn";
+            ConfigBtn.Size = new Size(81, 23);
+            ConfigBtn.TabIndex = 75;
+            ConfigBtn.Text = "Db Config";
+            ConfigBtn.UseVisualStyleBackColor = false;
+            ConfigBtn.Click += Config_Click;
             // 
             // ExistingPanel
             // 
@@ -784,9 +751,9 @@
             ExistingPanel.Controls.Add(ProjectDir);
             ExistingPanel.Controls.Add(ConStrTxt);
             ExistingPanel.Dock = DockStyle.Right;
-            ExistingPanel.Location = new Point(9, 0);
+            ExistingPanel.Location = new Point(12, 0);
             ExistingPanel.Name = "ExistingPanel";
-            ExistingPanel.Size = new Size(672, 412);
+            ExistingPanel.Size = new Size(669, 414);
             ExistingPanel.TabIndex = 31;
             ExistingPanel.Visible = false;
             // 
@@ -795,7 +762,7 @@
             ProcessProgress.Location = new Point(53, 350);
             ProcessProgress.MarqueeAnimationSpeed = 80;
             ProcessProgress.Name = "ProcessProgress";
-            ProcessProgress.Size = new Size(509, 10);
+            ProcessProgress.Size = new Size(530, 10);
             ProcessProgress.TabIndex = 45;
             // 
             // StatusGrid
@@ -815,7 +782,7 @@
             StatusGrid.RowHeadersWidth = 62;
             StatusGrid.RowTemplate.Height = 25;
             StatusGrid.ShowEditingIcon = false;
-            StatusGrid.Size = new Size(509, 318);
+            StatusGrid.Size = new Size(530, 318);
             StatusGrid.TabIndex = 44;
             // 
             // Process
@@ -863,15 +830,14 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(681, 532);
+            ClientSize = new Size(681, 506);
             Controls.Add(panel1);
             Controls.Add(panel3);
             Controls.Add(mainframe);
             FormBorderStyle = FormBorderStyle.None;
             Name = "CodeG";
+            StartPosition = FormStartPosition.CenterScreen;
             mainframe.ResumeLayout(false);
-            panel2.ResumeLayout(false);
-            panel4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             panel3.ResumeLayout(false);
             panel1.ResumeLayout(false);
@@ -892,9 +858,6 @@
         private Button NewProject;
         private Panel panel3;
         private Button ExistingProject;
-        private Panel panel2;
-        private Panel panel4;
-        private Button Close;
         private Panel panel1;
         private Panel panel6;
         private Panel ExistingPanel;
@@ -944,10 +907,10 @@
         private Button folderpathbtn;
         private Label label1;
         private TextBox folderpathTxt;
-        private Button InsPacBtn;
         private Button Config;
         private TextBox DbConTxt;
         private Label label13;
         private FontDialog fontDialog1;
+        private Button ConfigBtn;
     }
 }

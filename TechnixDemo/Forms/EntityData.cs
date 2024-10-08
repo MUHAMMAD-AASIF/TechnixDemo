@@ -20,7 +20,7 @@ namespace TechnixDemo.Forms
             _parentForm = parentForm;
             _entities = new List<EntitySelectModel>();
 
-            DatabaseHelper db = new DatabaseHelper();
+            DatabaseHelper db = new DatabaseHelper(_filePathRes.DbConfig);
             var entityNames = db.GetTableNames();
             _bindingList = new BindingList<EntitySelectModel>();
             foreach (var name in entityNames)
