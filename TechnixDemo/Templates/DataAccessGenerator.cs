@@ -6,7 +6,7 @@ namespace TechnixDemo.Templates
 {
     public class DataAccessGenerator
     {
-        public string GenerateDataAccess(EntitySelectModel entity, string ProjectName)
+        public string GenerateDataAccess(EntitySelectModel entity, string ProjectName,string DbConfig)
         {
             var dataAccessCode = new StringBuilder();
 
@@ -28,7 +28,7 @@ namespace TechnixDemo.Templates
             dataAccessCode.AppendLine("\t\t}");
             dataAccessCode.AppendLine();
 
-            DatabaseHelper db = new DatabaseHelper();
+            DatabaseHelper db = new DatabaseHelper(DbConfig);
 
             if (entity.GetAll)
             {

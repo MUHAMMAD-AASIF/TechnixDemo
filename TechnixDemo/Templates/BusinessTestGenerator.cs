@@ -139,6 +139,8 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"    public void Delete{entity.Entity}_ReturnsTrue_WhenValidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
+                testCode.AppendLine($"        var existingEntity = new {entity.Entity}();");
+                testCode.AppendLine($"        _mockDataAccess.Setup(da => da.GetById(It.IsAny<int>())).Returns(existingEntity);");
                 testCode.AppendLine($"        _mockDataAccess.Setup(da => da.Delete(It.IsAny<int>())).Returns(true);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Act");
@@ -153,6 +155,7 @@ namespace TechnixDemo.Templates
                 testCode.AppendLine($"    public void Delete{entity.Entity}_ReturnsFalse_WhenInvalidId()");
                 testCode.AppendLine("    {");
                 testCode.AppendLine("        // Arrange");
+                testCode.AppendLine($"        _mockDataAccess.Setup(da => da.GetById(It.IsAny<int>())).Returns(value: null);");
                 testCode.AppendLine($"        _mockDataAccess.Setup(da => da.Delete(It.IsAny<int>())).Returns(false);");
                 testCode.AppendLine();
                 testCode.AppendLine("        // Act");

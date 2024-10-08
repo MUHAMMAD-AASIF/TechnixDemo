@@ -1,6 +1,7 @@
 using TechnixDemo.Service;
 using TechnixDemo.Model;
 using TechnixDemo.Forms;
+using System.ComponentModel.DataAnnotations;
 
 namespace TechnixDemo
 {
@@ -35,19 +36,22 @@ namespace TechnixDemo
         private void NewProject_Click(object sender, EventArgs e)
         {
             this.NewPanel.Visible = true;
-            this.NewProject.BackColor = Color.Khaki;
             this.FrontPanel.Visible = true;
             this.ExistingPanel.Visible = false;
-            this.ExistingProject.BackColor = Color.White;
+
+            this.NewProject.BackColor = Color.White;
+            this.ExistingProject.BackColor = Color.FromArgb(238, 212, 132);
         }
 
         private void ExistingProject_Click(object sender, EventArgs e)
         {
             this.FrontPanel.Visible = false;
             this.NewPanel.Visible = true;
-            this.NewProject.BackColor = Color.White;
             this.ExistingPanel.Visible = false;
-            this.ExistingProject.BackColor = Color.Khaki;
+
+            this.NewProject.BackColor = Color.FromArgb(238, 212, 132);
+            this.ExistingProject.BackColor = Color.White;
+
         }
 
         private void folderpathbtn_Click(object sender, EventArgs e)
@@ -57,30 +61,49 @@ namespace TechnixDemo
 
         private async void GenProcBtn_Click(object sender, EventArgs e)
         {
-            // Hide and show necessary panels
-            TogglePanels(isProcessing: true);
-
-            // Retrieve input values
-            string solutionName = SolNmTxt.Text.Trim();
-            string projectName = ProcNmTxt.Text.Trim();
-            string projectPath = folderpathTxt.Text.Trim();
-
-            // Initialize the service and generate the project
-            GenerateService generateService = new GenerateService(StatusGrid, ProcessProgress);
-            var result = await generateService.GenerateAPIProjectAsync(solutionName, projectName, projectPath);
-
-            // Update project response model
-            UpdateProjectResponseModel(result, projectName, solutionName);
-
-            // If generation was successful, update UI and notify the user
-            if (result.Status)
+            if (SolNmTxt.Text == string.Empty)
             {
-                UpdatePaths(result);
-                TogglePanels(isProcessing: false);
-
-                ExistingProject_Click(sender, e);
-                MessageBox.Show("Project Created Successfully");
+                MessageBox.Show("Solution Name is Mandatory");
             }
+            else if (ProcNmTxt.Text == string.Empty)
+            {
+                MessageBox.Show("Project Name is Mandatory");
+            }
+            else if (folderpathTxt.Text == string.Empty)
+            {
+                MessageBox.Show("Directory Path is Mandatory");
+            }
+            else if (DbConTxt.Text == string.Empty)
+            {
+                MessageBox.Show("Connection String is Mandatory");
+            }
+            else
+            {
+                TogglePanels(isProcessing: true);
+
+                // Retrieve input values
+                string solutionName = SolNmTxt.Text.Trim();
+                string projectName = ProcNmTxt.Text.Trim();
+                string projectPath = folderpathTxt.Text.Trim();
+
+                // Initialize the service and generate the project
+                GenerateService generateService = new GenerateService(StatusGrid, ProcessProgress);
+                var result = await generateService.GenerateAPIProjectAsync(solutionName, projectName, projectPath);
+
+                // Update project response model
+                UpdateProjectResponseModel(result, projectName, solutionName);
+
+                // If generation was successful, update UI and notify the user
+                if (result.Status)
+                {
+                    UpdatePaths(result);
+                    TogglePanels(isProcessing: false);
+
+                    ExistingProject_Click(sender, e);
+                    MessageBox.Show("Project Created Successfully");
+                }
+            }
+
         }
 
         private void TogglePanels(bool isProcessing)
@@ -111,17 +134,32 @@ namespace TechnixDemo
         }
         private void runEntity_Click(object sender, EventArgs e)
         {
-            var validate = ValidatePaths(projectResponseModel);
-            if (validate.IsValid)
+            string AppContextPath = Path.Combine(projectResponseModel.DataAccessContractPath, "Context", $"AppDbContext.cs");
+            if (File.Exists(AppContextPath))
             {
-                EntityData entityData = new EntityData(projectResponseModel, this);
-                entityData.Show();
+                var validate = ValidatePaths(projectResponseModel);
+                if (validate.IsValid)
+                {
+                    if (DbConTxt.Text == string.Empty)
+                    {
+                        MessageBox.Show("Connection String is Mandatory");
+                    }
+                    else
+                    {
+                        projectResponseModel.DbConfig = DbConTxt.Text;
+                        EntityData entityData = new EntityData(projectResponseModel, this);
+                        entityData.Show();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show(validate.Message);
+                }
             }
             else
             {
-                MessageBox.Show(validate.Message);
+                MessageBox.Show("Run the Scaffold");
             }
-
         }
 
         private static ValidatePathModel ValidatePaths(ProjectResponseModel projectResponseModel)
@@ -297,13 +335,16 @@ namespace TechnixDemo
             SelectFolder(SolutionPath);
         }
 
-        private async void InsPacBtn_Click(object sender, EventArgs e)
+        private void Config_Click(object sender, EventArgs e)
         {
-            
-            GenerateService generateService = new GenerateService(StatusGrid, ProcessProgress);
-            await generateService.InstallPackageAsync(projectResponseModel, "DataAccess.Contracts");
-            await generateService.InstallPackageAsync(projectResponseModel, "Api.Test");
-            await generateService.InstallPackageAsync(projectResponseModel, "Business.Test");
+            DBConfig dbConfig = new DBConfig();
+
+            if (dbConfig.ShowDialog() == DialogResult.OK)
+            {
+                string dataFromForm2 = dbConfig.FormData;
+                DbConTxt.Text = dataFromForm2;
+            }
+
         }
     }
 }
